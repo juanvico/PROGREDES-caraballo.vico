@@ -5,3 +5,10 @@ Y:\Desktop\OblProgRedes\Client\bin\Debug\Client.exe
 Y:\Desktop\OblProgRedes\Client\bin\Debug\Client.pdb
 Y:\Desktop\OblProgRedes\Client\obj\Debug\Client.exe
 Y:\Desktop\OblProgRedes\Client\obj\Debug\Client.pdb
+\\Mac\Home\Desktop\OblProgRedes\Client\bin\Debug\Client.exe.config
+\\Mac\Home\Desktop\OblProgRedes\Client\bin\Debug\Client.exe
+\\Mac\Home\Desktop\OblProgRedes\Client\bin\Debug\Client.pdb
+\\Mac\Home\Desktop\OblProgRedes\Client\obj\Debug\Client.csprojAssemblyReference.cache
+\\Mac\Home\Desktop\OblProgRedes\Client\obj\Debug\Client.csproj.CoreCompileInputs.cache
+\\Mac\Home\Desktop\OblProgRedes\Client\obj\Debug\Client.exe
+\\Mac\Home\Desktop\OblProgRedes\Client\obj\Debug\Client.pdb
