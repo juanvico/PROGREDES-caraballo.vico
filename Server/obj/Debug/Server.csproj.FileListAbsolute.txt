@@ -1,0 +1,10 @@
+Y:\Desktop\OblProgRedes\Server\bin\Debug\Obligatorio.exe.config
+Y:\Desktop\OblProgRedes\Server\bin\Debug\Obligatorio.exe
+Y:\Desktop\OblProgRedes\Server\bin\Debug\Obligatorio.pdb
+Y:\Desktop\OblProgRedes\Server\bin\Debug\Logic.dll
+Y:\Desktop\OblProgRedes\Server\bin\Debug\Logic.pdb
+Y:\Desktop\OblProgRedes\Server\obj\Debug\Server.csprojAssemblyReference.cache
+Y:\Desktop\OblProgRedes\Server\obj\Debug\Server.csproj.CoreCompileInputs.cache
+Y:\Desktop\OblProgRedes\Server\obj\Debug\Server.csproj.CopyComplete
+Y:\Desktop\OblProgRedes\Server\obj\Debug\Obligatorio.exe
+Y:\Desktop\OblProgRedes\Server\obj\Debug\Obligatorio.pdb

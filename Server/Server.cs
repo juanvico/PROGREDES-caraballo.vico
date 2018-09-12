@@ -26,7 +26,6 @@ namespace Obligatorio
                 var client = server.Accept();
                 var thread = new Thread(() => Game.Welcome(client));
                 thread.Start();
-
             }
         }
     }

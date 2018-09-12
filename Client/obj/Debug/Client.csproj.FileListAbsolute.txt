@@ -1,0 +1,7 @@
+Y:\Desktop\OblProgRedes\Client\obj\Debug\Client.csprojAssemblyReference.cache
+Y:\Desktop\OblProgRedes\Client\obj\Debug\Client.csproj.CoreCompileInputs.cache
+Y:\Desktop\OblProgRedes\Client\bin\Debug\Client.exe.config
+Y:\Desktop\OblProgRedes\Client\bin\Debug\Client.exe
+Y:\Desktop\OblProgRedes\Client\bin\Debug\Client.pdb
+Y:\Desktop\OblProgRedes\Client\obj\Debug\Client.exe
+Y:\Desktop\OblProgRedes\Client\obj\Debug\Client.pdb

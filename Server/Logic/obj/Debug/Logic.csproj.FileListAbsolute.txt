@@ -1,0 +1,5 @@
+Y:\Desktop\OblProgRedes\Server\Logic\bin\Debug\Logic.dll
+Y:\Desktop\OblProgRedes\Server\Logic\bin\Debug\Logic.pdb
+Y:\Desktop\OblProgRedes\Server\Logic\obj\Debug\Logic.csproj.CoreCompileInputs.cache
+Y:\Desktop\OblProgRedes\Server\Logic\obj\Debug\Logic.dll
+Y:\Desktop\OblProgRedes\Server\Logic\obj\Debug\Logic.pdb
