@@ -23,6 +23,7 @@
 
         public void AssignRole(string role)
         {
+            this.Role = role;
             if (this.Role.Equals("monster"))
             {
                 Life = 100;

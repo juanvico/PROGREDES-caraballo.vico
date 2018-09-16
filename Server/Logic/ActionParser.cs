@@ -70,7 +70,6 @@ namespace Logic
                         {
                             Transmitter.Send(socket, "OK");
                         }
-                        Transmitter.Send(socket, "Select role (MONSTER - SURVIVOR):");
                         string role = Transmitter.Receive(socket);
                         string ip = ((IPEndPoint)socket.RemoteEndPoint).Address.ToString();
                         string port = ((IPEndPoint)socket.RemoteEndPoint).Port.ToString();

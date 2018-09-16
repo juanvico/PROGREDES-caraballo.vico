@@ -52,7 +52,6 @@ namespace Logic
             {
                 throw new NotExistingPlayer();
             }
-            else if (!ActiveMatch)
             lock (objParty)
             {
                 Party.Add(gp);
@@ -80,7 +79,7 @@ namespace Logic
 
         public static void AssignRole(string role, string nickname)
         {
-            if (!role.ToLower().Equals("monster") || !role.ToLower().Equals("survivor"))
+            if (!role.ToLower().Equals("monster") && !role.ToLower().Equals("survivor"))
             {
                 throw new IncorrectRoleEx();
             }

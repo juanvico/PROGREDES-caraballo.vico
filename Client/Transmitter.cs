@@ -9,6 +9,7 @@ namespace Client
 {
     public class Transmitter
     {
+        public static string LastMessage; 
         public static void Receive(Socket socket)
         {
             while (true)
@@ -28,7 +29,8 @@ namespace Client
                     if (recieved == 0) throw new SocketException();
                     pos += recieved;
                 }
-                Console.WriteLine(System.Text.Encoding.ASCII.GetString(msgBytes));
+                LastMessage = System.Text.Encoding.ASCII.GetString(msgBytes);
+                Console.WriteLine(LastMessage);
             }
         }
 

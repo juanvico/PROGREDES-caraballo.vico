@@ -34,11 +34,7 @@ namespace Client
                 else if (cmd.Equals("enter"))
                 {
                     Transmitter.Send(socket, "enter");
-                }
-                else if (cmd.Equals("selectRole"))
-                {
-                    Transmitter.Send(socket, "selectRole");
-                    SelectRole(socket);
+                    TryEnterGame(socket);
                 }
                 else
                 {
@@ -47,11 +43,15 @@ namespace Client
             }
         }
 
-        private static void SelectRole(Socket socket)
+        private static void TryEnterGame(Socket socket)
         {
-            Console.WriteLine("Select a role:");
-            string role = Console.ReadLine();
-            Transmitter.Send(socket, role);
+            
+            if (Transmitter.LastMessage.Equals("OK"))
+            {
+                Console.WriteLine("Select role(MONSTER - SURVIVOR):");
+                string role = Console.ReadLine();
+                Transmitter.Send(socket, role);
+            }
         }
 
         private static void ConnectPlayerToGame(Socket socket)
