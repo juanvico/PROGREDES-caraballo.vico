@@ -26,6 +26,7 @@ namespace Client
         private static void NewPlayerAction(Socket socket)
         {
             bool[] requestedInfo = new bool[2];
+
             while (true)
             {
                 if (requestedInfo[0] == false)
