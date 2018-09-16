@@ -24,10 +24,6 @@ namespace Server
             var executeServerCommands = new Thread(() => ExecuteCommands());
             startAcceptingClients.Start();
             executeServerCommands.Start();
-
-
-
-
         }
 
         public static void AcceptClients(Socket server)

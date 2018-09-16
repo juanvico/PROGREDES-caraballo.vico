@@ -47,7 +47,9 @@ namespace Logic
                     string nick = Transmitter.Receive(socket);
                     try
                     {
-                        Game.ConnectPlayer(nick);
+                        string ip = ((IPEndPoint)socket.RemoteEndPoint).Address.ToString();
+                        string port = ((IPEndPoint)socket.RemoteEndPoint).Port.ToString();
+                        Game.ConnectPlayerToParty(GamePlayer.Create(ip,port,nick));
                         Transmitter.Send(socket, "Player connected to the game.");
                     }
                     catch (ConnectedNicknameInUseEx ex)
@@ -55,6 +57,33 @@ namespace Logic
                         Transmitter.Send(socket, ex.Message);
                     }
                     catch (NotExistingPlayer ex)
+                    {
+                        Transmitter.Send(socket, ex.Message);
+                    }
+                }
+                else if (cmd.Equals("enter"))
+                {
+                    try
+                    {
+                        bool entered = Game.TryEnter();
+                        if (entered)
+                        {
+                            Transmitter.Send(socket, "OK");
+                        }
+                        Transmitter.Send(socket, "Select role (MONSTER - SURVIVOR):");
+                        string role = Transmitter.Receive(socket);
+                        string ip = ((IPEndPoint)socket.RemoteEndPoint).Address.ToString();
+                        string port = ((IPEndPoint)socket.RemoteEndPoint).Port.ToString();
+                        string nickname = Game.GetNicknameBySocket(ip,port);
+                        Game.AssignRole(role, nickname);
+                        Game.AddPlayerToMatch(nickname);
+                        Transmitter.Send(socket, "Logged in to match correctely. Start to play.");
+                    }
+                    catch (NotActiveMatch ex)
+                    {
+                        Transmitter.Send(socket, ex.Message);
+                    }
+                    catch (IncorrectRoleEx ex)
                     {
                         Transmitter.Send(socket, ex.Message);
                     }
@@ -73,7 +102,7 @@ namespace Logic
         {
             var command =  Utils.ToLwr(cmd);
 
-            if (Game.ISGameInProcess())
+            if (Game.IsActiveMatch())
             {
                 Console.WriteLine("Can't execute other commands while game in process.");
             }

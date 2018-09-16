@@ -11,19 +11,22 @@ namespace Logic
     public class Game
     {
         private static List<Player> Players;
-        private static List<string> ConnectedPlayers;
-        private static bool StartedGame;
+        private static List<GamePlayer> Party;
+        private static List<GamePlayer> GamePlayers;
+
+        private static bool ActiveMatch;
         private static Timer GameTimer;
         static readonly object objPlayers = new object();
-        static readonly object objConnPlayers = new object();
+        static readonly object objParty = new object();
+        static readonly object objGamePlayers = new object();
 
         const int THREE_MINUTES = 1000 * 60 * 3;
 
         public Game()
         {
             Players = new List<Player>();
-            ConnectedPlayers = new List<string>();
-
+            Party = new List<GamePlayer>();
+            GamePlayers = new List<GamePlayer>();
         }
 
         public static void AddPlayer(Player p)
@@ -38,27 +41,27 @@ namespace Logic
             }
         }
 
-        public static void ConnectPlayer(string nick)
+        public static void ConnectPlayerToParty(GamePlayer gp)
         {
 
-            if (ConnectedPlayers.Contains(nick))
+            if (Party.Exists(p => p.Nickname==gp.Nickname))
             {
                 throw new ConnectedNicknameInUseEx();
             }
-            else if (!Players.Exists(pl=>pl.Nickname==nick))
+            else if (!Players.Exists(pl=>pl.Nickname==gp.Nickname))
             {
                 throw new NotExistingPlayer();
             }
-            else if (!StartedGame)
-            lock (objConnPlayers)
+            else if (!ActiveMatch)
+            lock (objParty)
             {
-                ConnectedPlayers.Add(nick);
+                Party.Add(gp);
             }
         }
 
         public static void StartGame()
         {
-            StartedGame = true;
+            ActiveMatch = true;
             GameTimer = new Timer(THREE_MINUTES);
             GameTimer.Elapsed += EndGameByTimer;
             GameTimer.AutoReset = false;
@@ -70,9 +73,42 @@ namespace Logic
             Console.WriteLine("Game finished by timmer. jaja");
         }
 
-        public static bool ISGameInProcess()
+        public static bool IsActiveMatch()
         {
-            return StartedGame;
+            return ActiveMatch;
+        }
+
+        public static void AssignRole(string role, string nickname)
+        {
+            if (!role.ToLower().Equals("monster") || !role.ToLower().Equals("survivor"))
+            {
+                throw new IncorrectRoleEx();
+            }
+            GamePlayer gp = Party.Find(p => p.Nickname == nickname);
+            gp.AssignRole(role);
+        }
+
+        public static bool TryEnter()
+        {
+            if (!IsActiveMatch())
+            {
+                throw new NotActiveMatch();
+            }
+            return true;
+        }
+
+        public static string GetNicknameBySocket(string ip, string port)
+        {
+            return Party.Find(gp => gp.PlayerSocket.Equals(PlayerSocket.Create(ip, port))).Nickname;
+        }
+
+        public static void AddPlayerToMatch(string nickname)
+        {
+            GamePlayer gp = Party.Find(p => p.Nickname == nickname);
+            lock (objGamePlayers)
+            {
+                GamePlayers.Add(gp);
+            }
         }
     }
 }
