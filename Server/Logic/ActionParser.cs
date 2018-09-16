@@ -12,6 +12,10 @@ namespace Logic
     {
         public static bool Execute(string cmd, Socket socket)
         {
+            if (cmd.Equals("newplayer"))
+            {
+
+            }
             if (cmd.Equals("exit"))
             {
                 IPEndPoint remoteIpEndPoint = socket.RemoteEndPoint as IPEndPoint;

@@ -43,7 +43,12 @@
   <ItemGroup>
     <Compile Include="ActionParser.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="NicknameInUseEx.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -9,9 +9,20 @@ namespace Logic
 {
     public class Game
     {
-        public static void Welcome(Socket client)
+        private List<Player> Players;
+        public Game()
         {
-            Console.WriteLine("Nuevo jugador conectado.");
+            Players = new List<Player>();
         }
+
+        public void AddPlayer(Player p)
+        {
+            if (Players.Exists(pl=>pl.Nickname==p.Nickname))
+            {
+                throw new NicknameInUseEx();
+            }
+            Players.Add(p);
+        }
+
     }
 }
