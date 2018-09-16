@@ -10,25 +10,31 @@ namespace Client
 {
     public static class ActionParser
     {
-        public static void Execute(string cmd, Socket socket)
+        public static void Execute(Socket socket)
         {
-            if (cmd.Equals("exit"))
+            while (true)
             {
-                Environment.Exit(0);
-            }
-            if (cmd.Equals("newPlayer"))
-            {
-                NewPlayerAction(socket);
-            }
+                string cmd = Console.ReadLine();
 
+                if (cmd.Equals("exit"))
+                {
+                    Transmitter.Send(socket, "exit");
+                    Environment.Exit(0);
+                }
+                if (cmd.Equals("newplayer"))
+                {
+                    Transmitter.Send(socket, "newplayer");
+                    NewPlayerAction(socket);
+                }
+            }
         }
 
         private static void NewPlayerAction(Socket socket)
         {
             bool[] requestedInfo = new bool[2];
-
             while (true)
             {
+                
                 if (requestedInfo[0] == false)
                 {
                     Console.WriteLine("Insert nickname:");
@@ -41,10 +47,8 @@ namespace Client
                     Console.WriteLine("Insert avatar:");
                     string avatar = Console.ReadLine();
                     Transmitter.Send(socket, avatar);
-                    requestedInfo[0] = false;
-                    requestedInfo[1] = false;
+                    break;
                 }
-
             }
         }
     }

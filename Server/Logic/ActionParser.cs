@@ -8,22 +8,47 @@ using System.Threading.Tasks;
 
 namespace Logic
 {
-    public static class ActionParser
+    public class ActionParser
     {
-        public static bool Execute(string cmd, Socket socket)
-        {
-            if (cmd.Equals("newplayer"))
-            {
+        private static Game GameLogic;
 
-            }
-            if (cmd.Equals("exit"))
+        public static void SetGameLogic(Game gameLogic)
+        {
+            GameLogic = gameLogic;
+        }
+        public static void Execute(Socket socket)
+        {
+            while (true)
             {
-                IPEndPoint remoteIpEndPoint = socket.RemoteEndPoint as IPEndPoint;
-                Console.WriteLine("Cliente " + remoteIpEndPoint.Address + " cerrado.");
-                socket.Close();
-                return true;
+                string cmd = Transmitter.Receive(socket);
+
+                if (cmd.Equals("newplayer"))
+                {
+                    string nick = Transmitter.Receive(socket);
+                    string avatar = Transmitter.Receive(socket);
+                    try
+                    {
+                        Player player = new Player()
+                        {
+                            Nickname = nick,
+                            Avatar = avatar
+                        };
+                        Game.AddPlayer(player);
+                        Transmitter.Send(socket, "Player registered.");
+                    }
+                    catch (NicknameInUseEx ex)
+                    {
+                        Transmitter.Send(socket, ex.Message);
+                    }
+                }
+                if (cmd.Equals("exit"))
+                {
+                    IPEndPoint remoteIpEndPoint = socket.RemoteEndPoint as IPEndPoint;
+                    Console.WriteLine("Cliente " + remoteIpEndPoint.Address + " cerrado.");
+                    socket.Close();
+                    break;
+                }
             }
-            return false;
         }
     }
 }

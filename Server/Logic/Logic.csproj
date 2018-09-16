@@ -43,12 +43,11 @@
   <ItemGroup>
     <Compile Include="ActionParser.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="NicknameInUseEx.cs" />
+    <Compile Include="Exceptions\NicknameInUseEx.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Transmitter.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Exceptions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

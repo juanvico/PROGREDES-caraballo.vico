@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-    public static class Transmitter
+    public class Transmitter
     {
-        public static void Receive(Socket client)
+        public static void Receive(Socket socket)
         {
             while (true)
             {
@@ -18,18 +18,17 @@ namespace Client
                 var i = 0;
                 while (i < 4)
                 {
-                    i += client.Receive(lengthInBytes, i, 4 - i, SocketFlags.None);
+                    i += socket.Receive(lengthInBytes, i, 4 - i, SocketFlags.None);
                 }
                 int length = BitConverter.ToInt32(lengthInBytes, 0);
                 var msgBytes = new byte[length];
                 while (pos < length)
                 {
-                    var recieved = client.Receive(msgBytes, pos, length - pos, SocketFlags.None);
+                    var recieved = socket.Receive(msgBytes, pos, length - pos, SocketFlags.None);
                     if (recieved == 0) throw new SocketException();
                     pos += recieved;
                 }
                 Console.WriteLine(System.Text.Encoding.ASCII.GetString(msgBytes));
-               
             }
         }
 

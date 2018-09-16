@@ -5,11 +5,11 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Obligatorio
+namespace Logic
 {
     public class Transmitter
     {
-        public static void Receive(Socket client)
+        public static string Receive(Socket client)
         {
             while (true)
             {
@@ -28,13 +28,9 @@ namespace Obligatorio
                     if (recieved == 0) throw new SocketException();
                     pos += recieved;
                 }
-
+                
                 string cmd = System.Text.Encoding.ASCII.GetString(msgBytes);
-                bool exit = Logic.ActionParser.Execute(cmd, client);
-                if (exit)
-                {
-                    break;
-                }
+                return cmd;
             }
         }
 

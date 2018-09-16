@@ -9,19 +9,23 @@ namespace Logic
 {
     public class Game
     {
-        private List<Player> Players;
+        private static List<Player> Players;
+        static readonly object obj = new object();
         public Game()
         {
             Players = new List<Player>();
         }
 
-        public void AddPlayer(Player p)
+        public static void AddPlayer(Player p)
         {
             if (Players.Exists(pl=>pl.Nickname==p.Nickname))
             {
                 throw new NicknameInUseEx();
             }
-            Players.Add(p);
+            lock (obj)
+            {
+                Players.Add(p);
+            }
         }
 
     }
