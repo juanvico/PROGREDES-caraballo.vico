@@ -21,12 +21,28 @@ namespace Client
                     Transmitter.Send(socket, "exit");
                     Environment.Exit(0);
                 }
-                if (cmd.Equals("newplayer"))
+                else if (cmd.Equals("Anewplayer"))
                 {
                     Transmitter.Send(socket, "newplayer");
                     NewPlayerAction(socket);
                 }
+                else if (cmd.Equals("connect"))
+                {
+                    Transmitter.Send(socket, "connect");
+                    ConnectPlayerToGame(socket);
+                }
+                else
+                {
+                    Transmitter.Send(socket, "Incorrect command");
+                }
             }
+        }
+
+        private static void ConnectPlayerToGame(Socket socket)
+        {
+            Console.WriteLine("Insert nickname:");
+            string nickname = Console.ReadLine();
+            Transmitter.Send(socket, nickname);
         }
 
         private static void NewPlayerAction(Socket socket)
@@ -34,7 +50,7 @@ namespace Client
             bool[] requestedInfo = new bool[2];
             while (true)
             {
-                
+
                 if (requestedInfo[0] == false)
                 {
                     Console.WriteLine("Insert nickname:");
