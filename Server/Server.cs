@@ -8,12 +8,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Obligatorio
+namespace Server
 {
     class Server
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
+            Console.WriteLine("SERVER RUNNING");
             var server = new Socket(
                 AddressFamily.InterNetwork,
                 SocketType.Stream,
@@ -25,9 +26,8 @@ namespace Obligatorio
             {
                 var client = server.Accept();
                 var t1 = new Thread(() => Receive(client));
-                var t2 = new Thread(() => Send(client, "Cliente conectado."));
+                Send(client, "Cliente conectado.");
                 t1.Start();
-                t2.Start();
             }
         }
 
@@ -51,8 +51,13 @@ namespace Obligatorio
                     if (recieved == 0) throw new SocketException();
                     pos += recieved;
                 }
-
-                Console.WriteLine(System.Text.Encoding.ASCII.GetString(msgBytes));
+                
+                string cmd = System.Text.Encoding.ASCII.GetString(msgBytes);
+                bool exit = Logic.ActionParser.Execute(cmd, client);
+                if (exit)
+                {
+                    break;
+                }
             }
         }
 

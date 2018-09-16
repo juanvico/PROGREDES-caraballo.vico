@@ -72,6 +72,10 @@ namespace Client
                     if (sent == 0) throw new SocketException();
                     pos += sent;
                 }
+                if (msg.Equals("exit"))
+                {
+                    Environment.Exit(0);
+                }
             }
         }
 
