@@ -31,11 +31,27 @@ namespace Client
                     Transmitter.Send(socket, "connect");
                     ConnectPlayerToGame(socket);
                 }
+                else if (cmd.Equals("enter"))
+                {
+                    Transmitter.Send(socket, "enter");
+                }
+                else if (cmd.Equals("selectRole"))
+                {
+                    Transmitter.Send(socket, "selectRole");
+                    SelectRole(socket);
+                }
                 else
                 {
                     Transmitter.Send(socket, "Incorrect command");
                 }
             }
+        }
+
+        private static void SelectRole(Socket socket)
+        {
+            Console.WriteLine("Select a role:");
+            string role = Console.ReadLine();
+            Transmitter.Send(socket, role);
         }
 
         private static void ConnectPlayerToGame(Socket socket)
