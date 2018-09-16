@@ -41,7 +41,24 @@ namespace Logic
                         Transmitter.Send(socket, ex.Message);
                     }
                 }
-                if (cmd.Equals("exit"))
+                else if (cmd.Equals("connect"))
+                {
+                    string nick = Transmitter.Receive(socket);
+                    try
+                    {
+                        Game.ConnectPlayer(nick);
+                        Transmitter.Send(socket, "Player connected to the game.");
+                    }
+                    catch (ConnectedNicknameInUseEx ex)
+                    {
+                        Transmitter.Send(socket, ex.Message);
+                    }
+                    catch (NotExistingPlayer ex)
+                    {
+                        Transmitter.Send(socket, ex.Message);
+                    }
+                }
+                else if (cmd.Equals("exit"))
                 {
                     IPEndPoint remoteIpEndPoint = socket.RemoteEndPoint as IPEndPoint;
                     Console.WriteLine("Cliente " + remoteIpEndPoint.Address + " cerrado.");

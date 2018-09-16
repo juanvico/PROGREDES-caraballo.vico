@@ -4,12 +4,12 @@ using System.Runtime.Serialization;
 namespace Logic
 {
     [Serializable]
-    class NicknameInUseEx : Exception
+    class ConnectedNicknameInUseEx : Exception
     {
         override public string Message { get; }
-        public NicknameInUseEx()
+        public ConnectedNicknameInUseEx()
         {
-            Message = "Already exists player with same nickname. Try again.";
+            Message = "Already exists connected player with same nickname. Try again.";
         }
     }
 }

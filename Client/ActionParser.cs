@@ -21,7 +21,7 @@ namespace Client
                     Transmitter.Send(socket, "exit");
                     Environment.Exit(0);
                 }
-                else if (cmd.Equals("Anewplayer"))
+                else if (cmd.Equals("newplayer"))
                 {
                     Transmitter.Send(socket, "newplayer");
                     NewPlayerAction(socket);
