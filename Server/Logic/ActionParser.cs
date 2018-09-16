@@ -20,7 +20,8 @@ namespace Logic
         {
             while (true)
             {
-                string cmd = Transmitter.Receive(socket);
+                string command = Transmitter.Receive(socket);
+                var cmd = Utils.ToLwr(command);
 
                 if (cmd.Equals("newplayer"))
                 {
@@ -65,6 +66,21 @@ namespace Logic
                     socket.Close();
                     break;
                 }
+
+            }
+        }
+        public static void ExecuteCommand(string cmd)
+        {
+            var command =  Utils.ToLwr(cmd);
+
+            if (Game.ISGameInProcess())
+            {
+                Console.WriteLine("Can't execute other commands while game in process.");
+            }
+            else if (command.Equals("startgame"))
+            {
+               Game.StartGame();
+                Console.WriteLine("Game started !!! Enjoy");
             }
         }
     }

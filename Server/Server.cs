@@ -20,13 +20,36 @@ namespace Server
                 );
             server.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 6000));
             server.Listen(25);
+            var startAcceptingClients = new Thread(() => AcceptClients(server));
+            var executeServerCommands = new Thread(() => ExecuteCommands());
+            startAcceptingClients.Start();
+            executeServerCommands.Start();
+
+
+
+
+        }
+
+        public static void AcceptClients(Socket server)
+        {
             while (true)
             {
                 var client = server.Accept();
-                var t1 = new Thread(() => ActionParser.Execute(client));
+                var clientThread = new Thread(() => ActionParser.Execute(client));
                 Transmitter.Send(client, "Cliente conectado.");
-                t1.Start();
+                clientThread.Start();
+
             }
+
+        }
+        public static void ExecuteCommands()
+        {
+            while (true)
+            {
+                var command = Console.ReadLine();
+                ActionParser.ExecuteCommand(command);
+            }
+                
         }
     }
 }
