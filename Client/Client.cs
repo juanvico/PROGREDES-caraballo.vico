@@ -59,10 +59,10 @@ namespace Client
         {
             while (true)
             {
-                var msg = Console.ReadLine();
-                SendBitsLength(client, msg);
+                var cmd = Console.ReadLine();
+                SendBitsLength(client, cmd);
 
-                var byteMsg = System.Text.Encoding.ASCII.GetBytes(msg); //lo convierte a un array de bytes
+                var byteMsg = System.Text.Encoding.ASCII.GetBytes(cmd); //lo convierte a un array de bytes
                 var length = byteMsg.Length;
                 var pos = 0;
 
@@ -72,10 +72,7 @@ namespace Client
                     if (sent == 0) throw new SocketException();
                     pos += sent;
                 }
-                if (msg.Equals("exit"))
-                {
-                    Environment.Exit(0);
-                }
+                ActionParser.Execute(cmd, client);
             }
         }
 
