@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -10,6 +11,7 @@ namespace Client
 {
     public static class ActionParser
     {
+        private static bool IsPlaying = false;
         public static void Execute(Socket socket)
         {
             while (true)
@@ -45,13 +47,9 @@ namespace Client
 
         private static void TryEnterGame(Socket socket)
         {
-            
-            if (Transmitter.LastMessage.Equals("OK"))
-            {
-                Console.WriteLine("Select role(MONSTER - SURVIVOR):");
-                string role = Console.ReadLine();
-                Transmitter.Send(socket, role);
-            }
+            Console.WriteLine("Choose your role (MONSTER or SURVIVOR):");
+            string role = Console.ReadLine();
+            Transmitter.Send(socket, role);
         }
 
         private static void ConnectPlayerToGame(Socket socket)

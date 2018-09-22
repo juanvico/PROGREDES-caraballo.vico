@@ -87,13 +87,12 @@ namespace Logic
             gp.AssignRole(role);
         }
 
-        public static bool TryEnter()
+        public static void TryEnter()
         {
             if (!IsActiveMatch())
             {
                 throw new NotActiveMatch();
             }
-            return true;
         }
 
         public static string GetNicknameBySocket(string ip, string port)

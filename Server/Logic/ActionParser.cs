@@ -63,14 +63,10 @@ namespace Logic
                 }
                 else if (cmd.Equals("enter"))
                 {
+                    string role = Transmitter.Receive(socket);
                     try
                     {
-                        bool entered = Game.TryEnter();
-                        if (entered)
-                        {
-                            Transmitter.Send(socket, "OK");
-                        }
-                        string role = Transmitter.Receive(socket);
+                        Game.TryEnter();
                         string ip = ((IPEndPoint)socket.RemoteEndPoint).Address.ToString();
                         string port = ((IPEndPoint)socket.RemoteEndPoint).Port.ToString();
                         string nickname = Game.GetNicknameBySocket(ip,port);
@@ -86,6 +82,7 @@ namespace Logic
                     {
                         Transmitter.Send(socket, ex.Message);
                     }
+
                 }
                 else if (cmd.Equals("exit"))
                 {
