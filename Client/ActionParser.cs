@@ -11,7 +11,6 @@ namespace Client
 {
     public static class ActionParser
     {
-        private static bool IsPlaying = false;
         public static void Execute(Socket socket)
         {
             while (true)
@@ -37,6 +36,10 @@ namespace Client
                 {
                     Transmitter.Send(socket, "enter");
                     TryEnterGame(socket);
+                }
+                else if (cmd.Equals("attack"))
+                {
+                    Transmitter.Send(socket, "attack");
                 }
                 else
                 {

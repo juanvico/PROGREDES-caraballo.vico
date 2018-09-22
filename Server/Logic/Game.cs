@@ -22,6 +22,13 @@ namespace Logic
         static readonly object objPlayers = new object();
         static readonly object objParty = new object();
         static readonly object objGamePlayers = new object();
+
+        public static bool IsAlive(Socket socket)
+        {
+            string nickname = GetNicknameBySocket(socket);
+            return GamePlayers[nickname].Alive;
+        }
+
         static readonly object objMatrix = new object();
 
         const int THREE_MINUTES = 1000 * 60 * 3;
@@ -45,6 +52,74 @@ namespace Logic
             {
                 Players.Add(p);
             }
+        }
+
+        public static void Attack(Socket socket)
+        {
+            string nickname = GetNicknameBySocket(socket);
+            GamePlayer gp = GamePlayers[nickname];
+
+            List<GamePlayer> closerPlayers = GetCloserPlayers(gp);
+
+            foreach (GamePlayer playerToAttack in closerPlayers)
+            {
+                gp.Attack(playerToAttack);
+                string msgToAttacker, msgToAttacked;
+                if (playerToAttack.Alive)
+                {
+                    msgToAttacker = "You damaged " + gp.Damage + " life points to " +
+                    playerToAttack.Nickname + " ( " + playerToAttack.Life + " life remaining )";
+                    msgToAttacked = gp.Nickname + " damaged you with " + gp.Damage + " life points. You got "
+                        + playerToAttack.Life + " remaining life points.";
+                }
+                else
+                {
+                    msgToAttacker = "You killed " + playerToAttack.Nickname + ".";
+                    msgToAttacked = gp.Nickname + " killed you.";
+                    RemoveDeadPlayer(playerToAttack);
+                }
+                Transmitter.Send(gp.PlayerSocket, msgToAttacker);
+                Transmitter.Send(playerToAttack.PlayerSocket, msgToAttacked);
+            }
+
+            EndMatch();
+        }
+
+        private static void EndMatch()
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void RemoveDeadPlayer(GamePlayer playerToAttack)
+        {
+            Matrix[playerToAttack.Spot.Item1, playerToAttack.Spot.Item2] = null;
+        }
+
+        private static List<GamePlayer> GetCloserPlayers(GamePlayer gp)
+        {
+            List<GamePlayer> closerPlayers = new List<GamePlayer>();
+
+            for (int auxI = -1; auxI <= 1; auxI++)
+            {
+                for (int auxJ = -1; auxJ <= 1; auxJ++)
+                {
+                    int x = gp.Spot.Item1 + auxI;
+                    int y = gp.Spot.Item2 + auxJ;
+                    if (ValidIndex(x, y))
+                    {
+                        if (!IsSamePlayer(x, y, gp.Spot.Item1, gp.Spot.Item2))
+                        {
+                            if (!IsEmptySpot(x, y))
+                            {
+                                GamePlayer gpToInspect = Matrix[x, y];
+                                closerPlayers.Add(gpToInspect);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return closerPlayers;
         }
 
         public static void ConnectPlayerToParty(GamePlayer gp)
@@ -140,6 +215,19 @@ namespace Logic
                 CurrentPlayersNumber++;
             }
             InspectCloserPlayers(nickname);
+        }
+
+        public static bool IsCurrentlyPlayingMatch(Socket socket)
+        {
+            List<GamePlayer> players = GamePlayers.Values.ToList();
+            foreach (GamePlayer gp in players)
+            {
+                if (EqualsSocket(socket, gp.PlayerSocket))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public static Tuple<int, int> AssignPlayerSpot()

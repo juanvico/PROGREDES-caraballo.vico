@@ -11,6 +11,8 @@ namespace Logic
         public int Life { get; set; }
         public int Damage { get; set; }
 
+        public bool Alive { get { return Life > 0; } }
+
         public Tuple<int,int> Spot { get; set; }
 
         public static GamePlayer Create (Socket playerSocket, string nickname)
@@ -42,6 +44,19 @@ namespace Logic
         public void AssignSpot(Tuple<int, int> tuple)
         {
             Spot = tuple;
+        }
+
+        public void Attack(GamePlayer playerToAttack)
+        {
+            if (!(this.Role.Equals("survivor") && playerToAttack.Role.Equals("survivor")))
+            {
+                playerToAttack.ReceiveDamage(this.Damage);
+            }
+        }
+
+        public void ReceiveDamage(int damage)
+        {
+            this.Life -= damage;
         }
     }
 }
