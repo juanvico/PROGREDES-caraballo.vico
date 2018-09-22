@@ -47,9 +47,7 @@ namespace Logic
                     string nick = Transmitter.Receive(socket);
                     try
                     {
-                        string ip = ((IPEndPoint)socket.RemoteEndPoint).Address.ToString();
-                        string port = ((IPEndPoint)socket.RemoteEndPoint).Port.ToString();
-                        Game.ConnectPlayerToParty(GamePlayer.Create(ip,port,nick));
+                        Game.ConnectPlayerToParty(GamePlayer.Create(socket,nick));
                         Transmitter.Send(socket, "Player connected to the game.");
                     }
                     catch (ConnectedNicknameInUseEx ex)
@@ -67,9 +65,7 @@ namespace Logic
                     try
                     {
                         Game.TryEnter();
-                        string ip = ((IPEndPoint)socket.RemoteEndPoint).Address.ToString();
-                        string port = ((IPEndPoint)socket.RemoteEndPoint).Port.ToString();
-                        string nickname = Game.GetNicknameBySocket(ip,port);
+                        string nickname = Game.GetNicknameBySocket(socket);
                         Game.AssignRole(role, nickname);
                         Game.AddPlayerToMatch(nickname);
                         Transmitter.Send(socket, "Logged in to match correctely. Start to play.");
@@ -82,7 +78,10 @@ namespace Logic
                     {
                         Transmitter.Send(socket, ex.Message);
                     }
-
+                    catch (MaxNumberOfPlayers ex)
+                    {
+                        Transmitter.Send(socket, ex.Message);
+                    }
                 }
                 else if (cmd.Equals("exit"))
                 {
@@ -105,7 +104,7 @@ namespace Logic
             else if (command.Equals("startgame"))
             {
                Game.StartGame();
-                Console.WriteLine("Game started !!! Enjoy");
+                Console.WriteLine("Game started !!!");
             }
         }
     }
