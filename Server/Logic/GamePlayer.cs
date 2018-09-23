@@ -11,7 +11,7 @@ namespace Logic
         public int Life { get; set; }
         public int Damage { get; set; }
 
-        public bool Alive { get { return Life > 0; } }
+        public bool IsAlive { get { return Life > 0; } }
 
         public Tuple<int,int> Spot { get; set; }
 
@@ -29,7 +29,7 @@ namespace Logic
         public void AssignRole(string role)
         {
             this.Role = role;
-            if (this.Role.Equals("monster"))
+            if (IsMonster())
             {
                 Life = 100;
                 Damage = 10;
@@ -57,6 +57,29 @@ namespace Logic
         public void ReceiveDamage(int damage)
         {
             this.Life -= damage;
+        }
+
+        public bool IsMonster()
+        {
+            return Role.Equals("monster");
+        }
+
+        public bool IsSurvivor()
+        {
+            return Role.Equals("survivor");
+        }
+
+        public void Reset()
+        {
+            if (IsMonster())
+            {
+                Life = 100;
+            }
+            else
+            {
+                Life = 20;
+            }
+            Spot = new Tuple<int, int>(-1, -1);
         }
     }
 }

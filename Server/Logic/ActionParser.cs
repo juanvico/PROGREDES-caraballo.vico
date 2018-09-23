@@ -120,7 +120,7 @@ namespace Logic
 
         public static void ExecuteCommand(string cmd)
         {
-            var command =  Utils.ToLwr(cmd);
+            var command = Utils.ToLwr(cmd);
 
             if (Game.IsActiveMatch())
             {
@@ -128,7 +128,7 @@ namespace Logic
             }
             else if (command.Equals("startgame"))
             {
-               Game.StartGame();
+                Game.StartGame();
                 Console.WriteLine("Game started !!!");
             }
         }

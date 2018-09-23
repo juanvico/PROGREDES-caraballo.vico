@@ -26,7 +26,7 @@ namespace Logic
         public static bool IsAlive(Socket socket)
         {
             string nickname = GetNicknameBySocket(socket);
-            return GamePlayers[nickname].Alive;
+            return GamePlayers[nickname].IsAlive;
         }
 
         static readonly object objMatrix = new object();
@@ -37,9 +37,15 @@ namespace Logic
         {
             Players = new List<Player>();
             Party = new List<GamePlayer>();
+            SetMatchHelpers();
+        }
+
+        private static void SetMatchHelpers()
+        {
             GamePlayers = new Dictionary<string, GamePlayer>();
             CurrentPlayersNumber = 0;
             Matrix = new GamePlayer[8, 8];
+            ActiveMatch = false;
         }
 
         public static void AddPlayer(Player p)
@@ -65,7 +71,7 @@ namespace Logic
             {
                 gp.Attack(playerToAttack);
                 string msgToAttacker, msgToAttacked;
-                if (playerToAttack.Alive)
+                if (playerToAttack.IsAlive)
                 {
                     msgToAttacker = "You damaged " + gp.Damage + " life points to " +
                     playerToAttack.Nickname + " ( " + playerToAttack.Life + " life remaining )";
@@ -81,13 +87,86 @@ namespace Logic
                 Transmitter.Send(gp.PlayerSocket, msgToAttacker);
                 Transmitter.Send(playerToAttack.PlayerSocket, msgToAttacked);
             }
-
             EndMatch();
+            InspectCloserPlayers(nickname);
         }
 
         private static void EndMatch()
         {
-            throw new NotImplementedException();
+            int aliveMonsters = 0, aliveSurvivors = 0;
+            foreach (GamePlayer gp in GamePlayers.Values)
+            {
+                if (gp.IsMonster() && gp.IsAlive)
+                {
+                    aliveMonsters++;
+                }
+                else if (gp.IsSurvivor() && gp.IsAlive)
+                {
+                    aliveSurvivors++;
+                }
+            }
+            if (aliveMonsters == 1 && aliveSurvivors == 0)
+            {
+                GamePlayer winner = GamePlayers.Values.First();
+                string msg = winner.Nickname + " (" + winner.Role + ") won the game.";
+                foreach (GamePlayer connectedPlayer in Party)
+                {
+                    Transmitter.Send(connectedPlayer.PlayerSocket, msg);
+                }
+                Game.ResetMatch();
+            }
+            else if (aliveMonsters == 0 && aliveSurvivors > 0)
+            {
+                foreach (GamePlayer connectedPlayer in Party)
+                {
+                    string msg = "Survivors won.";
+                    Transmitter.Send(connectedPlayer.PlayerSocket, msg);
+                }
+                Game.ResetMatch();
+            }
+        }
+
+        public static void EndMatchByTimer()
+        {
+            int aliveMonsters = 0, aliveSurvivors = 0;
+            foreach (GamePlayer gp in GamePlayers.Values)
+            {
+                if (gp.IsMonster())
+                {
+                    aliveMonsters++;
+                }
+                else if (gp.IsSurvivor())
+                {
+                    aliveSurvivors++;
+                }
+            }
+            if (aliveSurvivors > 0)
+            {
+                foreach (GamePlayer connectedPlayer in Party)
+                {
+                    string msg = "Survivors won.";
+                    Transmitter.Send(connectedPlayer.PlayerSocket, msg);
+                }
+                Game.ResetMatch();
+            }
+            else if (aliveMonsters > 1 && aliveSurvivors == 0)
+            {
+                foreach (GamePlayer connectedPlayer in Party)
+                {
+                    string msg = "Nobody won.";
+                    Transmitter.Send(connectedPlayer.PlayerSocket, msg);
+                }
+                Game.ResetMatch();
+            }
+        }
+
+        private static void ResetMatch()
+        {
+            foreach (GamePlayer gp in GamePlayers.Values)
+            {
+                gp.Reset();
+            }
+            SetMatchHelpers();
         }
 
         private static void RemoveDeadPlayer(GamePlayer playerToAttack)
@@ -150,7 +229,7 @@ namespace Logic
 
         private static void EndGameByTimer(Object source, ElapsedEventArgs e)
         {
-            Console.WriteLine("Game finished by timmer. jaja");
+            EndMatchByTimer();
         }
 
         public static bool IsActiveMatch()
@@ -247,25 +326,28 @@ namespace Logic
 
         public static void InspectCloserPlayers(string nickname)
         {
-            GamePlayer gp = GamePlayers[nickname];
-            string msg = "Your position is [ " + (gp.Spot.Item1 + 1) + " ][ " + (gp.Spot.Item2 + 1) + " ]";
-            Transmitter.Send(gp.PlayerSocket, msg);
-            for (int auxI = -1; auxI <= 1; auxI++)
+            if (IsActiveMatch())
             {
-                for (int auxJ = -1; auxJ <= 1; auxJ++)
+                GamePlayer gp = GamePlayers[nickname];
+                string msg = "Your position is [ " + (gp.Spot.Item1 + 1) + " ][ " + (gp.Spot.Item2 + 1) + " ]";
+                Transmitter.Send(gp.PlayerSocket, msg);
+                for (int auxI = -1; auxI <= 1; auxI++)
                 {
-                    int x = gp.Spot.Item1 + auxI;
-                    int y = gp.Spot.Item2 + auxJ;
-                    if (ValidIndex(x, y))
+                    for (int auxJ = -1; auxJ <= 1; auxJ++)
                     {
-                        if (!IsSamePlayer(x, y, gp.Spot.Item1, gp.Spot.Item2))
+                        int x = gp.Spot.Item1 + auxI;
+                        int y = gp.Spot.Item2 + auxJ;
+                        if (ValidIndex(x, y))
                         {
-                            if (!IsEmptySpot(x, y))
+                            if (!IsSamePlayer(x, y, gp.Spot.Item1, gp.Spot.Item2))
                             {
-                                GamePlayer gpToInspect = Matrix[x, y];
-                                msg = "At [ " + (x + 1) + " ][ " + (y + 1) + " ] there is a " + gpToInspect.Role
-                                    + " ( " + gpToInspect.Nickname + " ) with " + gpToInspect.Life + " remaining life points.";
-                                Transmitter.Send(gp.PlayerSocket, msg);
+                                if (!IsEmptySpot(x, y))
+                                {
+                                    GamePlayer gpToInspect = Matrix[x, y];
+                                    msg = "At [ " + (x + 1) + " ][ " + (y + 1) + " ] there is a " + gpToInspect.Role
+                                        + " ( " + gpToInspect.Nickname + " ) with " + gpToInspect.Life + " remaining life points.";
+                                    Transmitter.Send(gp.PlayerSocket, msg);
+                                }
                             }
                         }
                     }
