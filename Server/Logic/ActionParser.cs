@@ -43,7 +43,7 @@ namespace Logic
                         }
                         else
                         {
-                            Transmitter.Send(socket, "ATTACK or MOVE [][]");
+                            Transmitter.Send(socket, Utils.GetMatchAvailableCmds());
                         }
                     }
                     else
@@ -132,6 +132,18 @@ namespace Logic
             {
                 Game.StartGame();
                 Console.WriteLine("Game started !!!");
+            }
+            else if (cmd.Equals("registeredplayers"))
+            {
+                Game.ListAllRegisteredPlayers();
+            }
+            else if (cmd.Equals("connectedplayers"))
+            {
+                Game.ListAllConnectedPlayers();
+            }
+            else
+            {
+                Console.WriteLine(Utils.GetServerAvailableCmds());
             }
         }
     }

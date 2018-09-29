@@ -62,6 +62,11 @@ namespace Logic
             return new string[0];
         }
 
+        public static string GetMatchAvailableCmds()
+        {
+            return "<attack> - <move * *>";
+        }
+
         public static PlayerSpot Move(PlayerSpot spot, string cmd)
         {
             string[] arr = ParseMoves(cmd);
@@ -144,12 +149,12 @@ namespace Logic
 
         public static string GetWinnerMessage(GamePlayer winner)
         {
-            return winner.Nickname + " (" + winner.Role + ") won the game.";
+            return winner.Nickname + " (" + winner.Role + ") WON THE GAME";
         }
 
         public static string GetSurvivorWinMessage()
         {
-            return "Survivors won.";
+            return "SURVIVORS WIN";
         }
 
         public static void ShowPlayerStatus(GamePlayer gp)
@@ -160,7 +165,17 @@ namespace Logic
 
         public static string GetNoWinnersMessage()
         {
-            return "Nobody won.";
+            return "NOBODY WINS";
+        }
+
+        public static string GetServerAvailableCmdsAfterEndMatch()
+        {
+            return "Match Ended. " + GetServerAvailableCmds();
+        }
+
+        public static string GetServerAvailableCmds()
+        {
+            return "Available commands: <startgame> - <registeredplayers> - <connectedplayers>";
         }
     }
 }

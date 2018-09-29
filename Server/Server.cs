@@ -34,7 +34,6 @@ namespace Server
                 var clientThread = new Thread(() => ActionParser.Execute(client));
                 Transmitter.Send(client, "Cliente conectado.");
                 clientThread.Start();
-
             }
 
         }

@@ -47,7 +47,7 @@ namespace Client
                 }
                 else
                 {
-                    Transmitter.Send(socket, "Incorrect command");
+                    Console.WriteLine(Utils.GetClientAvailableCmds());
                 }
             }
         }
@@ -82,7 +82,6 @@ namespace Client
             bool[] requestedInfo = new bool[2];
             while (true)
             {
-
                 if (requestedInfo[0] == false)
                 {
                     Console.WriteLine("Insert nickname:");
@@ -92,7 +91,7 @@ namespace Client
                 }
                 else
                 {
-                    Console.WriteLine("Insert avatar:");
+                    Console.WriteLine("Insert avatar path:");
                     string avatar = Console.ReadLine();
                     Transmitter.Send(socket, avatar);
                     break;

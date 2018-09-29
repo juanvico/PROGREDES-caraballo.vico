@@ -12,5 +12,10 @@ namespace Client
         {
             return cmd.ToLower();
         }
+
+        public static string GetClientAvailableCmds()
+        {
+            return "Available commands: <newplayer> - <connect> - <enter> - <exit>";
+        }
     }
 }

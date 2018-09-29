@@ -18,8 +18,9 @@ namespace Client
                SocketType.Stream,
                ProtocolType.Tcp
                );
-            Console.WriteLine("Ingrese puerto:");
-            int n = Int32.Parse(Console.ReadLine());
+
+            int n = TryParsePort();
+            
             socket.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), n));
             socket.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 6000));
 
@@ -27,6 +28,18 @@ namespace Client
             t2.Start();
             var t1 = new Thread(() => ActionParser.Execute(socket));
             t1.Start();
+        }
+
+        private static int TryParsePort()
+        {
+            bool isPortValid = false;
+            int n = -1;
+            while (!isPortValid)
+            {
+                Console.WriteLine("Ingrese puerto:");
+                isPortValid = Int32.TryParse(Console.ReadLine(), out n);
+            }
+            return n;
         }
     }
 }

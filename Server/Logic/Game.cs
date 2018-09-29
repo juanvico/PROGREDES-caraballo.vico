@@ -140,10 +140,11 @@ namespace Logic
             if (aliveMonsters == 1 && aliveSurvivors == 0)
             {
                 GamePlayer winner = GamePlayers.Values.First();
-                string msg = Utils.GetWinnerMessage(winner);
                 foreach (GamePlayer connectedPlayer in Party)
                 {
-                    Transmitter.Send(connectedPlayer.PlayerSocket, msg);
+                    Transmitter.Separator(connectedPlayer.PlayerSocket);
+                    Transmitter.Send(connectedPlayer.PlayerSocket, Utils.GetWinnerMessage(winner));
+                    Transmitter.Separator(connectedPlayer.PlayerSocket);
                 }
                 Game.ResetMatch();
             }
@@ -151,44 +152,32 @@ namespace Logic
             {
                 foreach (GamePlayer connectedPlayer in Party)
                 {
-                    string msg = Utils.GetSurvivorWinMessage();
-                    Transmitter.Send(connectedPlayer.PlayerSocket, msg);
+                    Transmitter.Separator(connectedPlayer.PlayerSocket);
+                    Transmitter.Send(connectedPlayer.PlayerSocket, Utils.GetSurvivorWinMessage());
+                    Transmitter.Separator(connectedPlayer.PlayerSocket);
                 }
                 Game.ResetMatch();
             }
         }
 
-        public static void EndMatchByTimer()
+        public static void ListAllConnectedPlayers()
         {
-            int aliveMonsters = 0, aliveSurvivors = 0;
-            foreach (GamePlayer gp in GamePlayers.Values)
+            Console.WriteLine("CONNECTED PLAYERS:");
+
+            foreach (GamePlayer p in Party)
             {
-                if (gp.IsMonster())
-                {
-                    aliveMonsters++;
-                }
-                else if (gp.IsSurvivor())
-                {
-                    aliveSurvivors++;
-                }
+                IPEndPoint remoteIpEndPoint = p.PlayerSocket.RemoteEndPoint as IPEndPoint;
+                Console.WriteLine(p.Nickname + " (" + remoteIpEndPoint.Address + ":" + remoteIpEndPoint.Port + ")");
             }
-            if (aliveSurvivors > 0)
+        }
+
+        public static void ListAllRegisteredPlayers()
+        {
+            Console.WriteLine("REGISTERED PLAYERS:");
+
+            foreach (Player p in Players)
             {
-                foreach (GamePlayer connectedPlayer in Party)
-                {
-                    string msg = Utils.GetSurvivorWinMessage();
-                    Transmitter.Send(connectedPlayer.PlayerSocket, msg);
-                }
-                Game.ResetMatch();
-            }
-            else if (aliveMonsters > 1 && aliveSurvivors == 0)
-            {
-                foreach (GamePlayer connectedPlayer in Party)
-                {
-                    string msg = Utils.GetNoWinnersMessage();
-                    Transmitter.Send(connectedPlayer.PlayerSocket, msg);
-                }
-                Game.ResetMatch();
+                Console.WriteLine(p.Nickname + " (" + p.Avatar + ")");
             }
         }
 
@@ -199,6 +188,7 @@ namespace Logic
                 gp.Reset();
             }
             SetMatchHelpers();
+            Console.WriteLine(Utils.GetServerAvailableCmdsAfterEndMatch());
         }
 
         private static void RemoveDeadPlayer(GamePlayer playerToAttack)
@@ -237,7 +227,6 @@ namespace Logic
 
         public static void ConnectPlayerToParty(GamePlayer gp)
         {
-
             if (Party.Exists(p => p.Nickname == gp.Nickname))
             {
                 throw new ConnectedNicknameInUseEx();
@@ -263,7 +252,38 @@ namespace Logic
 
         private static void EndGameByTimer(Object source, ElapsedEventArgs e)
         {
-            EndMatchByTimer();
+            int aliveMonsters = 0, aliveSurvivors = 0;
+            foreach (GamePlayer gp in GamePlayers.Values)
+            {
+                if (gp.IsMonster())
+                {
+                    aliveMonsters++;
+                }
+                else if (gp.IsSurvivor())
+                {
+                    aliveSurvivors++;
+                }
+            }
+            if (aliveSurvivors > 0)
+            {
+                foreach (GamePlayer connectedPlayer in Party)
+                {
+                    Transmitter.Separator(connectedPlayer.PlayerSocket);
+                    Transmitter.Send(connectedPlayer.PlayerSocket, Utils.GetSurvivorWinMessage());
+                    Transmitter.Separator(connectedPlayer.PlayerSocket);
+                }
+                Game.ResetMatch();
+            }
+            else if (aliveMonsters > 0 && aliveSurvivors == 0)
+            {
+                foreach (GamePlayer connectedPlayer in Party)
+                {
+                    Transmitter.Separator(connectedPlayer.PlayerSocket);
+                    Transmitter.Send(connectedPlayer.PlayerSocket, Utils.GetNoWinnersMessage());
+                    Transmitter.Separator(connectedPlayer.PlayerSocket);
+                }
+                Game.ResetMatch();
+            }
         }
 
         public static bool IsActiveMatch()
