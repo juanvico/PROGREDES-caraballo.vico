@@ -10,12 +10,6 @@ namespace Logic
 {
     public class ActionParser
     {
-        private static Game GameLogic;
-
-        public static void SetGameLogic(Game gameLogic)
-        {
-            GameLogic = gameLogic;
-        }
         public static void Execute(Socket socket)
         {
             while (true)
@@ -31,9 +25,21 @@ namespace Logic
                         {
                             Game.Attack(socket);
                         }
-                        else if (cmd.Equals("move"))
+                        else if (cmd.StartsWith("move "))
                         {
-
+                            try
+                            {
+                                Utils.CheckMovementCmd(cmd);
+                                Game.Move(socket, cmd);
+                            }
+                            catch (IncorrectMoveCmdEx ex)
+                            {
+                                Transmitter.Send(socket, ex.Message);
+                            }
+                            catch (ExistsPlayerForMoveEx ex)
+                            {
+                                Transmitter.Send(socket, ex.Message);
+                            }
                         }
                         else
                         {
@@ -95,10 +101,6 @@ namespace Logic
                             Transmitter.Send(socket, "Logged in to match correctely. Start to play.");
                         }
                         catch (NotActiveMatch ex)
-                        {
-                            Transmitter.Send(socket, ex.Message);
-                        }
-                        catch (IncorrectRoleEx ex)
                         {
                             Transmitter.Send(socket, ex.Message);
                         }

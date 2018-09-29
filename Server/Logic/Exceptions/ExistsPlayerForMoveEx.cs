@@ -4,12 +4,12 @@ using System.Runtime.Serialization;
 namespace Logic
 {
     [Serializable]
-    class IncorrectRoleEx : Exception
+    class ExistsPlayerForMoveEx : Exception
     {
         override public string Message { get; }
-        public IncorrectRoleEx()
+        public ExistsPlayerForMoveEx()
         {
-            Message = "Select MONSTER or SURVIVOR role.";
+            Message = "Can't move. There's a player there. Try again.";
         }
     }
 }

@@ -41,6 +41,10 @@ namespace Client
                 {
                     Transmitter.Send(socket, "attack");
                 }
+                else if (cmd.StartsWith("move"))
+                {
+                    Transmitter.Send(socket, cmd);
+                }
                 else
                 {
                     Transmitter.Send(socket, "Incorrect command");
@@ -50,8 +54,19 @@ namespace Client
 
         private static void TryEnterGame(Socket socket)
         {
-            Console.WriteLine("Choose your role (MONSTER or SURVIVOR):");
-            string role = Console.ReadLine();
+            bool validRole = false;
+            string role = "";
+            while (!validRole)
+            {
+                Console.WriteLine("Choose your role (MONSTER or SURVIVOR):");
+                role = Console.ReadLine();
+                role = Utils.ToLwr(role);
+                if (role.Equals("monster") || role.Equals("survivor"))
+                {
+                    validRole = true;
+                }
+            }
+            
             Transmitter.Send(socket, role);
         }
 

@@ -13,15 +13,26 @@ namespace Logic
 
         public bool IsAlive { get { return Life > 0; } }
 
-        public Tuple<int,int> Spot { get; set; }
+        public PlayerSpot Spot;
+        public struct PlayerSpot
+        {
+            public int Row;
+            public int Column;
+            public PlayerSpot(int row, int column)
+            {
+                Row = row;
+                Column = column;
+            }
+        }
 
-        public static GamePlayer Create (Socket playerSocket, string nickname)
+
+        public static GamePlayer Create(Socket playerSocket, string nickname)
         {
             GamePlayer gp = new GamePlayer()
             {
                 PlayerSocket = playerSocket,
                 Nickname = nickname,
-                Spot = new Tuple<int, int>(-1, -1)
+                Spot = new PlayerSpot(-1, -1)
             };
             return gp;
         }
@@ -41,17 +52,14 @@ namespace Logic
             }
         }
 
-        public void AssignSpot(Tuple<int, int> tuple)
+        public void AssignSpot(int row, int column)
         {
-            Spot = tuple;
+            Spot = new PlayerSpot(row, column);
         }
 
         public void Attack(GamePlayer playerToAttack)
         {
-            if (!(this.Role.Equals("survivor") && playerToAttack.Role.Equals("survivor")))
-            {
-                playerToAttack.ReceiveDamage(this.Damage);
-            }
+            playerToAttack.ReceiveDamage(this.Damage);
         }
 
         public void ReceiveDamage(int damage)
@@ -79,7 +87,7 @@ namespace Logic
             {
                 Life = 20;
             }
-            Spot = new Tuple<int, int>(-1, -1);
+            Spot = new PlayerSpot(-1, -1);
         }
     }
 }

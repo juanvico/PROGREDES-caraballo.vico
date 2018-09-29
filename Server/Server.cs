@@ -11,8 +11,8 @@ namespace Server
         public static void Main(string[] args)
         {
             Console.WriteLine("SERVER RUNNING");
-            Game GameLogic = new Game();
-            ActionParser.SetGameLogic(GameLogic);
+            Game.InitGame();
+            Obligatorio.TestData.LoadTestData();
             var server = new Socket(
                 AddressFamily.InterNetwork,
                 SocketType.Stream,

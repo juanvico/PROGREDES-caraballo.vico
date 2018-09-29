@@ -34,6 +34,11 @@ namespace Logic
             }
         }
 
+        public static void Separator(Socket socket)
+        {
+            Send(socket, "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ");
+        }
+
         public static void Send(Socket client, string message = "")
         {
             var msg = message;
