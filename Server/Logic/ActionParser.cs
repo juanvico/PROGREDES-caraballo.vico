@@ -65,6 +65,7 @@ namespace Logic
                                 Avatar = avatar
                             };
                             Game.AddPlayer(player);
+                            SaveImage(socket, avatar);
                             Transmitter.Send(socket, "Player registered.");
                         }
                         catch (NicknameInUseEx ex)
@@ -118,6 +119,18 @@ namespace Logic
                     }
                 }
             }
+        }
+
+        private static void SaveImage(Socket socket, string nickname)
+        {
+            ImageWriter.SetImageLocation(nickname);
+            while (true)
+            {
+                byte[] fragment = Transmitter.ReceiveImage(socket);
+                ImageWriter.WriteFragment(fragment);
+                if (fragment.Length < ImageWriter.fragmentSize) break;
+            }
+            ImageWriter.CloseFile();
         }
 
         public static void ExecuteCommand(string cmd)

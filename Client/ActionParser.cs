@@ -91,12 +91,23 @@ namespace Client
                 }
                 else
                 {
-                    Console.WriteLine("Insert avatar path:");
-                    string avatar = Console.ReadLine();
-                    Transmitter.Send(socket, avatar);
+                    Console.WriteLine("Insert avatar file name:");
+                    string fileName = Console.ReadLine();
+                    Transmitter.Send(socket, fileName);
+                    SendImage(socket, fileName);
                     break;
                 }
             }
+        }
+
+        private static void SendImage(Socket socket, string path)
+        {
+            ImageReader.SetPath(path);
+            foreach (byte[] fragment in ImageReader.ImageFragments())
+            {
+                Transmitter.SendImage(socket, fragment);
+            }
+            ImageReader.CloseFile();
         }
     }
 }

@@ -9,7 +9,6 @@ namespace Client
 {
     public class Transmitter
     {
-        public static string LastMessage; 
         public static void Receive(Socket socket)
         {
             while (true)
@@ -29,8 +28,7 @@ namespace Client
                     if (recieved == 0) throw new SocketException();
                     pos += recieved;
                 }
-                LastMessage = System.Text.Encoding.ASCII.GetString(msgBytes);
-                Console.WriteLine(LastMessage);
+                Console.WriteLine(System.Text.Encoding.ASCII.GetString(msgBytes));
             }
         }
 
@@ -51,7 +49,7 @@ namespace Client
             }
         }
 
-        static void SendBitsLength(Socket client, string msg)
+        private static void SendBitsLength(Socket client, string msg)
         {
             var messaageLengthInInt = msg.Length;
             var messageLengthInBit = BitConverter.GetBytes(messaageLengthInInt);
@@ -59,6 +57,30 @@ namespace Client
             while (i < 4)
             {
                 i += client.Send(messageLengthInBit, i, 4 - i, SocketFlags.None);
+            }
+        }
+
+        public static void SendImage(Socket client, byte[] msg)
+        {
+            SendImageBitsLength(client, msg);
+
+            var pos = 0;
+            while (pos < msg.Length)
+            {
+                var sent = client.Send(msg, pos, msg.Length - pos, SocketFlags.None);
+                if (sent == 0) throw new SocketException();
+                pos += sent;
+            }
+        }
+
+        private static void SendImageBitsLength(Socket client, byte[] msg)
+        {
+            var length = msg.Length;
+            var dataLength = BitConverter.GetBytes(length);
+            var i = 0;
+            while (i < 4)
+            {
+                i += client.Send(dataLength, i, 4 - i, SocketFlags.None);
             }
         }
     }
