@@ -38,6 +38,7 @@ namespace Logic
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                return ex.Message;
             }
         }
 
