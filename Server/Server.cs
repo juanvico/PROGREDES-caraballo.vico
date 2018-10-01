@@ -8,35 +8,85 @@ namespace Server
 {
     class Server
     {
+        private static IPAddress serverIP;
+        private static int serverPort;
         public static void Main(string[] args)
         {
-            Console.WriteLine("SERVER RUNNING");
-            Game.InitGame();
-            Obligatorio.TestData.LoadTestData();
-            var server = new Socket(
-                AddressFamily.InterNetwork,
-                SocketType.Stream,
-                ProtocolType.Tcp
-                );
-            server.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 6000));
-            server.Listen(25);
-            var startAcceptingClients = new Thread(() => AcceptClients(server));
-            var executeServerCommands = new Thread(() => ExecuteCommands());
-            startAcceptingClients.Start();
-            executeServerCommands.Start();
+            try
+            {
+                AskIPAndPort();
+                Game.InitGame();
+                Obligatorio.TestData.LoadTestData();
+                var server = new Socket(
+                    AddressFamily.InterNetwork,
+                    SocketType.Stream,
+                    ProtocolType.Tcp
+                    );
+
+                server.Bind(new IPEndPoint(serverIP, serverPort));
+                server.Listen(25);
+                var startAcceptingClients = new Thread(() => AcceptClients(server));
+                var executeServerCommands = new Thread(() => ExecuteCommands());
+                startAcceptingClients.Start();
+                executeServerCommands.Start();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.ReadKey();
+            }
+        }
+
+        private static void AskIPAndPort()
+        {
+            bool isIPValid = false;
+            bool isPortValid = false;
+            while (!isIPValid)
+            {
+                Console.WriteLine("Write Server IP: (localhost: 127.0.0.1)");
+                isIPValid = IPAddress.TryParse(Console.ReadLine(), out serverIP);
+            }
+            while (!isPortValid)
+            {
+
+                Console.WriteLine("Write Server Port:");
+                isPortValid = Int32.TryParse(Console.ReadLine(), out serverPort);
+            }
+            Console.WriteLine(Utils.GetSeparator());
+            Console.WriteLine("Server started.");
+            Console.WriteLine(Utils.GetSeparator());
         }
 
         public static void AcceptClients(Socket server)
         {
             while (true)
             {
-                var client = server.Accept();
-                var clientThread = new Thread(() => ActionParser.Execute(client));
-                Transmitter.Send(client, "Cliente conectado.");
+                Socket socket = server.Accept();
+                var clientThread = new Thread(() => ActionParser.Execute(socket));
                 clientThread.Start();
+
+                IPEndPoint remoteIpEndPoint = socket.RemoteEndPoint as IPEndPoint;
+                IPEndPoint localIpEndPoint = socket.LocalEndPoint as IPEndPoint;
+                string msgToServer = "Connection established to: " + remoteIpEndPoint.Address + ":" + remoteIpEndPoint.Port;
+                string msgToClient = "Connection established to: " + localIpEndPoint.Address + ":" + localIpEndPoint.Port;
+                NotifyServerNewClient(msgToServer);
+                NotifySuccessfulConnectionToClient(socket, msgToClient);
             }
 
         }
+
+        private static void NotifySuccessfulConnectionToClient(Socket socket, string msg)
+        {
+            Transmitter.Send(socket, msg);
+        }
+
+        private static void NotifyServerNewClient(string msg)
+        {
+            Console.WriteLine(Utils.GetSeparator());
+            Console.WriteLine(msg);
+            Console.WriteLine(Utils.GetSeparator());
+        }
+
         public static void ExecuteCommands()
         {
             while (true)
@@ -44,7 +94,6 @@ namespace Server
                 var command = Console.ReadLine();
                 ActionParser.ExecuteCommand(command);
             }
-                
         }
     }
 }

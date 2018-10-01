@@ -11,32 +11,39 @@ namespace Logic
     {
         public static string Receive(Socket client)
         {
-            while (true)
+            try
             {
-                var pos = 0;
-                var lengthInBytes = new byte[4];
-                var i = 0;
-                while (i < 4)
+                while (true)
                 {
-                    i += client.Receive(lengthInBytes, i, 4 - i, SocketFlags.None);
+                    var pos = 0;
+                    var lengthInBytes = new byte[4];
+                    var i = 0;
+                    while (i < 4)
+                    {
+                        i += client.Receive(lengthInBytes, i, 4 - i, SocketFlags.None);
+                    }
+                    int length = BitConverter.ToInt32(lengthInBytes, 0);
+                    var msgBytes = new byte[length];
+                    while (pos < length)
+                    {
+                        var recieved = client.Receive(msgBytes, pos, length - pos, SocketFlags.None);
+                        if (recieved == 0) throw new SocketException();
+                        pos += recieved;
+                    }
+
+                    string cmd = System.Text.Encoding.ASCII.GetString(msgBytes);
+                    return cmd;
                 }
-                int length = BitConverter.ToInt32(lengthInBytes, 0);
-                var msgBytes = new byte[length];
-                while (pos < length)
-                {
-                    var recieved = client.Receive(msgBytes, pos, length - pos, SocketFlags.None);
-                    if (recieved == 0) throw new SocketException();
-                    pos += recieved;
-                }
-                
-                string cmd = System.Text.Encoding.ASCII.GetString(msgBytes);
-                return cmd;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
 
         public static void Separator(Socket socket)
         {
-            Send(socket, "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ");
+            Send(socket, Utils.GetSeparator());
         }
 
         public static void Send(Socket client, string message = "")

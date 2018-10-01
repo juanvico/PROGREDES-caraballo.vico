@@ -9,11 +9,10 @@ namespace Logic
 {
     public class Utils
     {
-        public static Tuple<int,int> Tuple(int row, int column)
+        public static string GetSeparator()
         {
-            return new Tuple<int, int>(row, column);
+            return "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ";
         }
-
         public static string ToLwr(string cmd)
         {
             return cmd.ToLower();

@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 
 namespace Client
@@ -92,6 +87,7 @@ namespace Client
                 else
                 {
                     Console.WriteLine("Insert avatar file name:");
+                    Console.WriteLine("Example: avatar.jpg (File must be placed in application directory)");
                     string fileName = Console.ReadLine();
                     Transmitter.Send(socket, fileName);
                     SendImage(socket, fileName);
