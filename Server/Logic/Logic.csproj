@@ -52,6 +52,7 @@
     <Compile Include="Exceptions\MaxNumberOfPlayers.cs" />
     <Compile Include="Exceptions\IncorrectMoveCmdEx.cs" />
     <Compile Include="ImageWriter.cs" />
+    <Compile Include="Exceptions\NotConnectedPlayerEx.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Transmitter.cs" />

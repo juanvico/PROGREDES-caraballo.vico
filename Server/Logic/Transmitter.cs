@@ -11,34 +11,26 @@ namespace Logic
     {
         public static string Receive(Socket client)
         {
-            try
+            while (true)
             {
-                while (true)
+                var pos = 0;
+                var lengthInBytes = new byte[4];
+                var i = 0;
+                while (i < 4)
                 {
-                    var pos = 0;
-                    var lengthInBytes = new byte[4];
-                    var i = 0;
-                    while (i < 4)
-                    {
-                        i += client.Receive(lengthInBytes, i, 4 - i, SocketFlags.None);
-                    }
-                    int length = BitConverter.ToInt32(lengthInBytes, 0);
-                    var msgBytes = new byte[length];
-                    while (pos < length)
-                    {
-                        var recieved = client.Receive(msgBytes, pos, length - pos, SocketFlags.None);
-                        if (recieved == 0) throw new SocketException();
-                        pos += recieved;
-                    }
-
-                    string cmd = System.Text.Encoding.ASCII.GetString(msgBytes);
-                    return cmd;
+                    i += client.Receive(lengthInBytes, i, 4 - i, SocketFlags.None);
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return ex.Message;
+                int length = BitConverter.ToInt32(lengthInBytes, 0);
+                var msgBytes = new byte[length];
+                while (pos < length)
+                {
+                    var recieved = client.Receive(msgBytes, pos, length - pos, SocketFlags.None);
+                    if (recieved == 0) throw new SocketException();
+                    pos += recieved;
+                }
+
+                string cmd = System.Text.Encoding.ASCII.GetString(msgBytes);
+                return cmd;
             }
         }
 

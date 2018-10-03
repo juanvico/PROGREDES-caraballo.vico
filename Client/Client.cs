@@ -49,13 +49,25 @@ namespace Client
             {
                 if (subject.Equals("client"))
                 {
-                    Console.WriteLine("Write your IP: (localhost: 127.0.0.1)");
-                    isIPValid = IPAddress.TryParse(Console.ReadLine(), out clientIP);
+                    Console.WriteLine("Write your IP: (press ENTER for localhost)");
+                    string msg = Console.ReadLine();
+                    if (!msg.Equals("")) isIPValid = IPAddress.TryParse(Console.ReadLine(), out clientIP);
+                    else
+                    {
+                        clientIP = IPAddress.Parse("127.0.0.1");
+                        isIPValid = true;
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Write Server IP: (localhost: 127.0.0.1)");
-                    isIPValid = IPAddress.TryParse(Console.ReadLine(), out serverIP);
+                    Console.WriteLine("Write Server IP: (press ENTER for localhost)");
+                    string msg = Console.ReadLine();
+                    if (!msg.Equals("")) isIPValid = IPAddress.TryParse(Console.ReadLine(), out serverIP);
+                    else
+                    {
+                        serverIP = IPAddress.Parse("127.0.0.1");
+                        isIPValid = true;
+                    }
                 }
             }
             while (!isPortValid)
@@ -67,8 +79,14 @@ namespace Client
                 }
                 else
                 {
-                    Console.WriteLine("Write Server port:");
-                    isPortValid = Int32.TryParse(Console.ReadLine(), out serverPort);
+                    Console.WriteLine("Write Server Port: (press ENTER for 6000)");
+                    string msg = Console.ReadLine();
+                    if (!msg.Equals("")) isPortValid = Int32.TryParse(Console.ReadLine(), out serverPort);
+                    else
+                    {
+                        serverPort = 6000;
+                        isPortValid = true;
+                    }
                 }
             }
         }

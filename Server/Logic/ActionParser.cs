@@ -12,113 +12,144 @@ namespace Logic
     {
         public static void Execute(Socket socket)
         {
-            while (true)
+            bool loop = true;
+            while (loop)
             {
                 string command = Transmitter.Receive(socket);
                 var cmd = Utils.ToLwr(command);
 
-                if (Game.IsCurrentlyPlayingMatch(socket))
+                if (Game.IsDeadPlayer(socket))
                 {
-                    if (Game.IsAlive(socket))
-                    {
-                        if (cmd.Equals("attack"))
-                        {
-                            Game.Attack(socket);
-                        }
-                        else if (cmd.StartsWith("move "))
-                        {
-                            try
-                            {
-                                Utils.CheckMovementCmd(cmd);
-                                Game.Move(socket, cmd);
-                            }
-                            catch (IncorrectMoveCmdEx ex)
-                            {
-                                Transmitter.Send(socket, ex.Message);
-                            }
-                            catch (ExistsPlayerForMoveEx ex)
-                            {
-                                Transmitter.Send(socket, ex.Message);
-                            }
-                        }
-                        else
-                        {
-                            Transmitter.Send(socket, Utils.GetMatchAvailableCmds());
-                        }
-                    }
-                    else
-                    {
-                        Transmitter.Send(socket, "You lost this match. Wait until it finishes.");
-                    }
+                    Transmitter.Send(socket, Utils.GetWaitMessageForLoser());
                 }
-                else
+                else if (!Game.IsCurrentlyPlayingMatch(socket))
                 {
-                    if (cmd.Equals("newplayer"))
-                    {
-                        string nick = Transmitter.Receive(socket);
-                        string avatar = Transmitter.Receive(socket);
-                        try
-                        {
-                            Player player = new Player()
-                            {
-                                Nickname = nick,
-                                Avatar = avatar
-                            };
-                            Game.AddPlayer(player);
-                            SaveImage(socket, avatar);
-                            Transmitter.Send(socket, "Player registered.");
-                        }
-                        catch (NicknameInUseEx ex)
-                        {
-                            Transmitter.Send(socket, ex.Message);
-                        }
-                    }
-                    else if (cmd.Equals("connect"))
-                    {
-                        string nick = Transmitter.Receive(socket);
-                        try
-                        {
-                            Game.ConnectPlayerToParty(GamePlayer.Create(socket, nick));
-                            Transmitter.Send(socket, "Player connected to the game.");
-                        }
-                        catch (ConnectedNicknameInUseEx ex)
-                        {
-                            Transmitter.Send(socket, ex.Message);
-                        }
-                        catch (NotExistingPlayer ex)
-                        {
-                            Transmitter.Send(socket, ex.Message);
-                        }
-                    }
-                    else if (cmd.Equals("enter"))
-                    {
-                        string role = Transmitter.Receive(socket);
-                        try
-                        {
-                            Game.TryEnter();
-                            string nickname = Game.GetNicknameBySocket(socket);
-                            Game.AssignRole(role, nickname);
-                            Game.AddPlayerToMatch(nickname);
-                            Transmitter.Send(socket, "Logged in to match correctely. Start to play.");
-                        }
-                        catch (NotActiveMatch ex)
-                        {
-                            Transmitter.Send(socket, ex.Message);
-                        }
-                        catch (MaxNumberOfPlayers ex)
-                        {
-                            Transmitter.Send(socket, ex.Message);
-                        }
-                    }
-                    else if (cmd.Equals("exit"))
-                    {
-                        IPEndPoint remoteIpEndPoint = socket.RemoteEndPoint as IPEndPoint;
-                        Console.WriteLine("Cliente " + remoteIpEndPoint.Address + " cerrado.");
-                        socket.Close();
-                        break;
-                    }
+                    loop = LetExecuteClientAction(socket, cmd);
+                }
+                else if (Game.IsCurrentlyPlayingMatch(socket))
+                {
+                    LetExecuteGameAction(socket, cmd);
                 }
             }
+        }
+
+        private static bool LetExecuteClientAction(Socket socket, string cmd)
+        {
+            if (cmd.Equals("newplayer"))
+            {
+                string nick = Transmitter.Receive(socket);
+                string avatar = Transmitter.Receive(socket);
+                try
+                {
+                    Player player = new Player
+                    {
+                        Nickname = nick
+                    };
+                    if (!avatar.Equals("default"))
+                    {
+                        player.Avatar = GetTimestamp(DateTime.Now) + avatar;
+                        SaveImage(socket, player.Avatar);
+                    }
+                    else { player.Avatar = avatar; }
+                    Game.AddPlayer(player);
+                    NotifyClientRegisteredPlayer(socket);
+                }
+                catch (NicknameInUseEx ex)
+                {
+                    Transmitter.Send(socket, ex.Message);
+                }
+            }
+            else if (cmd.Equals("connect"))
+            {
+                string nick = Transmitter.Receive(socket);
+                try
+                {
+                    Game.ConnectPlayerToParty(GamePlayer.Create(socket, nick));
+                    Transmitter.Send(socket, "Player connected to the game.");
+                }
+                catch (ConnectedNicknameInUseEx ex)
+                {
+                    Transmitter.Send(socket, ex.Message);
+                }
+                catch (NotExistingPlayer ex)
+                {
+                    Transmitter.Send(socket, ex.Message);
+                }
+            }
+            else if (cmd.Equals("enter"))
+            {
+                string role = Transmitter.Receive(socket);
+                try
+                {
+                    Game.TryEnter();
+                    string nickname = Game.GetNicknameBySocket(socket);
+                    Game.CheckIfPlayerIsConnected(nickname);
+                    Game.AssignRole(role, nickname);
+                    Game.AddPlayerToMatch(nickname);
+                    Transmitter.Send(socket, "Logged in to match correctely. Start to play.");
+                }
+                catch (NotActiveMatch ex)
+                {
+                    Transmitter.Send(socket, ex.Message);
+                }
+                catch (MaxNumberOfPlayers ex)
+                {
+                    Transmitter.Send(socket, ex.Message);
+                }
+                catch (NotConnectedPlayerEx ex)
+                {
+                    Transmitter.Send(socket, ex.Message);
+                }
+            }
+            else if (cmd.Equals("exit"))
+            {
+                Game.ExitClient(socket);
+                IPEndPoint remoteIpEndPoint = socket.RemoteEndPoint as IPEndPoint;
+                Console.WriteLine("Cliente " + remoteIpEndPoint.Address + ":" + remoteIpEndPoint.Port + " cerrado.");
+                socket.Close();
+                return false;
+            }
+            return true;
+        }
+
+        private static void LetExecuteGameAction(Socket socket, string cmd)
+        {
+            if (cmd.Equals("attack"))
+            {
+                Game.Attack(socket);
+            }
+            else if (cmd.StartsWith("move "))
+            {
+                try
+                {
+                    Utils.CheckMovementCmd(cmd);
+                    Game.Move(socket, cmd);
+                }
+                catch (IncorrectMoveCmdEx ex)
+                {
+                    Transmitter.Send(socket, ex.Message);
+                }
+                catch (ExistsPlayerForMoveEx ex)
+                {
+                    Transmitter.Send(socket, ex.Message);
+                }
+            }
+            else
+            {
+                Transmitter.Send(socket, Utils.GetMatchAvailableCmds());
+            }
+        }
+
+        public static string GetTimestamp(DateTime value)
+        {
+            return value.ToString("yyyyMMddHHmmssffff");
+        }
+
+        private static void NotifyClientRegisteredPlayer(Socket socket)
+        {
+            Transmitter.Separator(socket);
+            Transmitter.Send(socket, "Player registered.");
+            Transmitter.Separator(socket);
         }
 
         private static void SaveImage(Socket socket, string nickname)
@@ -144,7 +175,7 @@ namespace Logic
             else if (command.Equals("startgame"))
             {
                 Game.StartGame();
-                Console.WriteLine("Game started !!!");
+                Console.WriteLine("GAME STARTED!");
             }
             else if (cmd.Equals("registeredplayers"))
             {

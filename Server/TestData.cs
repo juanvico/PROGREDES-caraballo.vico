@@ -11,10 +11,14 @@ namespace Obligatorio
     {
         public static void LoadTestData()
         {
-            Game.AddPlayer(new Player() { Nickname = "1", Avatar = "1" });
-            Game.AddPlayer(new Player() { Nickname = "2", Avatar = "2" });
-            Game.AddPlayer(new Player() { Nickname = "3", Avatar = "3" });
-            Game.AddPlayer(new Player() { Nickname = "4", Avatar = "4" });
+            Game.AddPlayer(new Player() { Nickname = "1", Avatar = "default" });
+            Game.AddPlayer(new Player() { Nickname = "2", Avatar = "default" });
+            Game.AddPlayer(new Player() { Nickname = "3", Avatar = "default" });
+            Game.AddPlayer(new Player() { Nickname = "4", Avatar = "default" });
+            Game.AddPlayer(new Player() { Nickname = "5", Avatar = "default" });
+            Game.AddPlayer(new Player() { Nickname = "6", Avatar = "default" });
+            Game.AddPlayer(new Player() { Nickname = "7", Avatar = "default" });
+            Game.AddPlayer(new Player() { Nickname = "8", Avatar = "default" });
         }
     }
 }

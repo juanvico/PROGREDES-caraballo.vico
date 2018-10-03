@@ -16,7 +16,9 @@ namespace Logic
         private static List<GamePlayer> Party;
         private static int CurrentPlayersNumber;
         private static GamePlayer[,] Matrix;
+
         private static Dictionary<string, GamePlayer> GamePlayers;
+        private static List<string> DeadPlayers;
 
         private static bool ActiveMatch;
         private static Timer GameTimer;
@@ -25,10 +27,10 @@ namespace Logic
         static readonly object objGamePlayers = new object();
         static readonly object objAttack = new object();
 
-        public static bool IsAlive(Socket socket)
+        public static bool IsDeadPlayer(Socket socket)
         {
             string nickname = GetNicknameBySocket(socket);
-            return GamePlayers[nickname].IsAlive;
+            return DeadPlayers.Contains(nickname);
         }
 
         static readonly object objMatrix = new object();
@@ -39,6 +41,7 @@ namespace Logic
         {
             Players = new List<Player>();
             Party = new List<GamePlayer>();
+            DeadPlayers = new List<string>();
             SetMatchHelpers();
         }
 
@@ -69,6 +72,7 @@ namespace Logic
             CurrentPlayersNumber = 0;
             Matrix = new GamePlayer[8, 8];
             ActiveMatch = false;
+            DeadPlayers = new List<string>();
         }
 
         public static void AddPlayer(Player p)
@@ -116,6 +120,21 @@ namespace Logic
             }
             EndMatch();
             InspectCloserPlayers(nickname);
+        }
+
+        public static void ExitClient(Socket socket)
+        {
+            string nick = GetNicknameBySocket(socket);
+            GamePlayer gp = Party.Find(p => p.Nickname == nick);
+            Party.Remove(gp);
+        }
+
+        public static void CheckIfPlayerIsConnected(string nickname)
+        {
+            if (!Party.Exists(p => p.Nickname==nickname))
+            {
+                throw new NotConnectedPlayerEx();
+            }
         }
 
         private static bool AreNotSurvivors(GamePlayer gp, GamePlayer playerToAttack)
@@ -193,9 +212,14 @@ namespace Logic
 
         private static void RemoveDeadPlayer(GamePlayer playerToAttack)
         {
+            DeadPlayers.Add(playerToAttack.Nickname);
             lock (objMatrix)
             {
                 Matrix[playerToAttack.Spot.Row, playerToAttack.Spot.Column] = null;
+            }
+            lock (objGamePlayers)
+            {
+                GamePlayers.Remove(playerToAttack.Nickname);
             }
         }
 

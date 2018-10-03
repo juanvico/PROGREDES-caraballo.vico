@@ -43,14 +43,25 @@ namespace Server
             bool isPortValid = false;
             while (!isIPValid)
             {
-                Console.WriteLine("Write Server IP: (localhost: 127.0.0.1)");
-                isIPValid = IPAddress.TryParse(Console.ReadLine(), out serverIP);
+                Console.WriteLine("Write Server IP: (press ENTER for localhost)");
+                string msg = Console.ReadLine();
+                if (!msg.Equals("")) isIPValid = IPAddress.TryParse(Console.ReadLine(), out serverIP);
+                else
+                {
+                    serverIP = IPAddress.Parse("127.0.0.1");
+                    isIPValid = true;
+                }
             }
             while (!isPortValid)
             {
-
-                Console.WriteLine("Write Server Port:");
-                isPortValid = Int32.TryParse(Console.ReadLine(), out serverPort);
+                Console.WriteLine("Write Server Port: (press ENTER for 6000)");
+                string msg = Console.ReadLine();
+                if (!msg.Equals("")) isPortValid = Int32.TryParse(Console.ReadLine(), out serverPort);
+                else
+                {
+                    serverPort = 6000;
+                    isPortValid = true;
+                }
             }
             Console.WriteLine(Utils.GetSeparator());
             Console.WriteLine("Server started.");

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
-
+using System.Threading;
 
 namespace Client
 {
@@ -11,6 +11,7 @@ namespace Client
             while (true)
             {
                 string cmd = Console.ReadLine();
+                cmd = Utils.ToLwr(cmd);
 
                 if (cmd.Equals("exit"))
                 {
@@ -61,7 +62,7 @@ namespace Client
                     validRole = true;
                 }
             }
-            
+
             Transmitter.Send(socket, role);
         }
 
@@ -86,19 +87,42 @@ namespace Client
                 }
                 else
                 {
-                    Console.WriteLine("Insert avatar file name:");
-                    Console.WriteLine("Example: avatar.jpg (File must be placed in application directory)");
-                    string fileName = Console.ReadLine();
-                    Transmitter.Send(socket, fileName);
-                    SendImage(socket, fileName);
+                    TrySendImage(socket);
                     break;
+                }
+            }
+        }
+
+        private static void TrySendImage(Socket socket)
+        {
+            bool isFileValid = false;
+            while (!isFileValid)
+            {
+                Console.WriteLine("Insert avatar file name: (press ENTER to ignore)");
+                Console.WriteLine("Example: avatar.jpg (File must be placed in application directory)");
+                string fileName = Console.ReadLine();
+
+                if (!fileName.Equals(""))
+                {
+                    isFileValid = ImageReader.SetPath(fileName);
+                    if (isFileValid)
+                    {
+                        Transmitter.Send(socket, fileName);
+                        SendImage(socket, fileName);
+                    }
+                }
+                else
+                {
+                    Transmitter.Send(socket, "default");
+                    isFileValid = true;
                 }
             }
         }
 
         private static void SendImage(Socket socket, string path)
         {
-            ImageReader.SetPath(path);
+
+
             foreach (byte[] fragment in ImageReader.ImageFragments())
             {
                 Transmitter.SendImage(socket, fragment);

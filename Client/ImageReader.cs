@@ -9,9 +9,17 @@ namespace Client
         public const int fragmentSize = 32000;
         private static FileStream stream;
 
-        public static void SetPath(string path)
+        public static bool SetPath(string path)
         {
-            stream = File.OpenRead(path);
+            try
+            {
+                stream = File.OpenRead(path);
+                return true;
+            }
+            catch (FileNotFoundException)
+            {
+                return false;
+            }
         }
 
         public static IEnumerable<byte[]> ImageFragments()

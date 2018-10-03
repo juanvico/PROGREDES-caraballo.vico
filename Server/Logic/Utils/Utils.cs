@@ -41,6 +41,11 @@ namespace Logic
             }
         }
 
+        public static string GetWaitMessageForLoser()
+        {
+            return "You lost this match. Wait until it finishes.";
+        }
+
         private static bool ValidDirectionCmd(string v)
         {
             var cmd = ToLwr(v);
