@@ -51,7 +51,7 @@ namespace Client
                 {
                     Console.WriteLine("Write your IP: (press ENTER for localhost)");
                     string msg = Console.ReadLine();
-                    if (!msg.Equals("")) isIPValid = IPAddress.TryParse(Console.ReadLine(), out clientIP);
+                    if (!msg.Equals("")) isIPValid = IPAddress.TryParse(msg, out clientIP);
                     else
                     {
                         clientIP = IPAddress.Parse("127.0.0.1");
@@ -62,7 +62,7 @@ namespace Client
                 {
                     Console.WriteLine("Write Server IP: (press ENTER for localhost)");
                     string msg = Console.ReadLine();
-                    if (!msg.Equals("")) isIPValid = IPAddress.TryParse(Console.ReadLine(), out serverIP);
+                    if (!msg.Equals("")) isIPValid = IPAddress.TryParse(msg, out serverIP);
                     else
                     {
                         serverIP = IPAddress.Parse("127.0.0.1");
@@ -81,7 +81,7 @@ namespace Client
                 {
                     Console.WriteLine("Write Server Port: (press ENTER for 6000)");
                     string msg = Console.ReadLine();
-                    if (!msg.Equals("")) isPortValid = Int32.TryParse(Console.ReadLine(), out serverPort);
+                    if (!msg.Equals("")) isPortValid = Int32.TryParse(msg, out serverPort);
                     else
                     {
                         serverPort = 6000;
