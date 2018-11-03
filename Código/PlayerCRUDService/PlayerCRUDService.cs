@@ -1,0 +1,72 @@
+﻿using PlayerCRUDServiceInterfaces;
+using Protocols;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace PlayerCRUDService
+{
+    public class PlayerCRUDService : MarshalByRefObject, IPlayerCRUDService
+    {
+        private static List<Player> Players = new List<Player>();
+        static readonly object objPlayers = new object();
+
+        public Player Add(Player player)
+        {
+            lock (objPlayers)
+            {
+                if (Players.Exists(pl => pl.Nickname == player.Nickname))
+                {
+                    throw new NicknameInUseEx();
+                }
+                Players.Add(new Player() { Nickname = player.Nickname, Avatar = player.Avatar});
+            }
+            return player;
+        }
+
+        public Player Get(Guid id)
+        {
+            return Players.Find(p => p.Id == id);
+        }
+
+        public Player Update(Guid id, Player updatedPlayer)
+        {
+            Player player = Players.Find(p => p.Id == id);
+
+            if (Players.Exists(pl => pl.Nickname == updatedPlayer.Nickname && pl.Id != player.Id))
+            {
+                throw new NicknameInUseEx();
+            }
+
+            player.Nickname = updatedPlayer.Nickname;
+            player.Avatar = updatedPlayer.Avatar;
+
+            return player;
+            //que pasa si el player está conectado?
+            //que onda con el avatar?
+        }
+
+        public List<Player> GetPlayers()
+        {
+            return Players;
+        }
+
+        public void Delete(Guid id)
+        {
+            Players.Remove(Get(id));
+        }
+
+        public bool Exists(Guid id)
+        {
+            return Players.Exists(p => p.Id == id);
+        }
+
+        public bool ExistsByNickname(string nickname)
+        {
+            return Players.Exists(p => p.Nickname == nickname);
+        }
+    }
+}
