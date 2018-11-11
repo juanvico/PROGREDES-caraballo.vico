@@ -60,8 +60,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Properties\DataSources\LogServiceInterfaces.Match.datasource" />
+    <None Include="Properties\DataSources\LogServiceInterfaces.PlayerStats.datasource" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LogServiceInterfaces\LogServiceInterfaces.csproj">
+      <Project>{5b8d67cc-a6d3-4bdb-b6d3-e68c74ecd4e2}</Project>
+      <Name>LogServiceInterfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PlayerCRUDServiceInterfaces\PlayerCRUDServiceInterfaces.csproj">
       <Project>{16799994-750c-4fdb-b00b-69f4c9e061f6}</Project>
       <Name>PlayerCRUDServiceInterfaces</Name>

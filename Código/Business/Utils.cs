@@ -1,4 +1,5 @@
-﻿using Protocols;
+﻿using System;
+using Protocols;
 using static Business.GamePlayer;
 
 namespace Business
@@ -116,9 +117,25 @@ namespace Business
             return newSpot;
         }
 
+        public static string MoveMessage(GamePlayer gp, PlayerSpot oldSpot, PlayerSpot newSpot)
+        {
+            return gp.Role + " (" + gp.Nickname + ") moved from r." + oldSpot.Row + " c." + oldSpot.Column +
+                " to r." + newSpot.Row + " c." + newSpot.Column;
+        }
+
+        public static string GetDamageStatus(GamePlayer gp, GamePlayer playerToAttack)
+        {
+            return gp.Nickname + " damaged "+ playerToAttack.Nickname +" with " + gp.Damage + " life points.";
+        }
+
         public static string GetAttackerKillStatus(GamePlayer playerToAttack)
         {
             return "You killed " + playerToAttack.Nickname + ".";
+        }
+
+        public static string GetKillStatus(GamePlayer gp, GamePlayer playerToAttack)
+        {
+            return gp.Nickname + " killed " + playerToAttack.Nickname + "."; ;
         }
 
         public static string GetAttackedKillStatus(GamePlayer gp)
@@ -141,7 +158,7 @@ namespace Business
 
         public static void ShowCloserPlayerStatus(GamePlayer gp, GamePlayer gpToInspect)
         {
-            string msg = gpToInspect.Role + " <" + gpToInspect.Nickname + "> r." +
+            string msg = gpToInspect.Role + " (" + gpToInspect.Nickname + ") r." +
                 gpToInspect.Spot.Row + " c." + gpToInspect.Spot.Column + " : " +
                 gpToInspect.Life + " life points.";
             ServerTransmitter.Send(gp.PlayerSocket, msg);
@@ -176,6 +193,16 @@ namespace Business
         public static string GetServerAvailableCmds()
         {
             return "Available commands: <startgame> - <registeredplayers> - <connectedplayers>";
+        }
+
+        public static string TimesUp()
+        {
+            return "Time's up!";
+        }
+
+        public static string PlayerEntered(GamePlayer gp)
+        {
+            return gp.Role + " (" + gp.Nickname + ") joined the game.";
         }
     }
 }

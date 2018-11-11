@@ -22,7 +22,7 @@ namespace PlayerCRUDService
                 {
                     throw new NicknameInUseEx();
                 }
-                Players.Add(new Player() { Nickname = player.Nickname, Avatar = player.Avatar});
+                Players.Add(new Player() { Nickname = player.Nickname, Avatar = player.Avatar });
             }
             return player;
         }
@@ -45,8 +45,6 @@ namespace PlayerCRUDService
             player.Avatar = updatedPlayer.Avatar;
 
             return player;
-            //que pasa si el player está conectado?
-            //que onda con el avatar?
         }
 
         public List<Player> GetPlayers()

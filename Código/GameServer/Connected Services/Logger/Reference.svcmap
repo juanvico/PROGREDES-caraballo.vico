@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="1026350f-7f36-4236-bdb8-6a86295b1566" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:6300/LogService/mex" Protocol="mex" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="b3b39fd3-632d-4a77-af5b-aef17d7f28ad" SourceId="1" SourceUrl="http://localhost:6300/LogService/mex" />
+    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="26129b60-9808-4f84-b876-b0d12b3445f0" SourceId="1" SourceUrl="http://localhost:6300/LogService/mex" />
+    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="3c3453da-ec04-4180-b5eb-c5d01ef2d9a3" SourceId="1" SourceUrl="http://localhost:6300/LogService/mex" />
+    <MetadataFile FileName="Arrays.xsd" MetadataType="Schema" ID="413609d2-0efb-4fc0-9cb8-53b7263bd5f0" SourceId="1" SourceUrl="http://localhost:6300/LogService/mex" />
+    <MetadataFile FileName="LogServiceInterfaces.xsd" MetadataType="Schema" ID="59af3e04-6e78-49ee-9981-4cc34ea3a304" SourceId="1" SourceUrl="http://localhost:6300/LogService/mex" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

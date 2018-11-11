@@ -105,11 +105,10 @@ namespace GameClient
 
                 if (!fileName.Equals(""))
                 {
-                    isFileValid = ImageReader.SetPath(fileName);
+                    isFileValid = ImageReader.FileExists(fileName);
                     if (isFileValid)
                     {
-                        ClientTransmitter.Send(socket, fileName);
-                        SendImage(socket, fileName);
+                        ClientTransmitter.Send(socket, ImageReader.GetBase64Image(fileName));
                     }
                 }
                 else
@@ -118,15 +117,6 @@ namespace GameClient
                     isFileValid = true;
                 }
             }
-        }
-
-        private static void SendImage(Socket socket, string path)
-        {
-            foreach (byte[] fragment in ImageReader.ImageFragments())
-            {
-                ClientTransmitter.SendImage(socket, fragment);
-            }
-            ImageReader.CloseFile();
         }
     }
 }

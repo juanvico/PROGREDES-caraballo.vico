@@ -1,4 +1,5 @@
-﻿using PlayerCRUDServiceInterfaces;
+﻿using LogServiceInterfaces;
+using PlayerCRUDServiceInterfaces;
 using Protocols;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,11 @@ namespace Business
 
         private static Dictionary<string, GamePlayer> GamePlayers;
         private static List<string> DeadPlayers;
+
+        private static List<PlayerStats> MatchPlayers;
+
+        private const int KILL_POINTS = 10;
+        private const int WINNER_POINTS = 100;
 
         private static bool ActiveMatch;
         private static Timer GameTimer;
@@ -46,20 +52,25 @@ namespace Business
         public static void Move(Socket socket, string cmd)
         {
             GamePlayer gp = GamePlayers[GetNicknameBySocket(socket)];
-            PlayerSpot possibleSpot = Utils.Move(gp.Spot, cmd);
-            if (!ValidIndex(possibleSpot.Row, possibleSpot.Column))
+            PlayerSpot oldSpot = new PlayerSpot(gp.Spot.Row, gp.Spot.Column);
+            PlayerSpot newSpot = Utils.Move(gp.Spot, cmd);
+            if (!ValidIndex(newSpot.Row, newSpot.Column))
             {
                 throw new IncorrectMoveCmdEx();
             }
-            if (!IsEmptySpot(possibleSpot.Row, possibleSpot.Column))
+            if (!IsEmptySpot(newSpot.Row, newSpot.Column))
             {
                 throw new ExistsPlayerForMoveEx();
             }
             lock (objMatrix)
             {
                 Matrix[gp.Spot.Row, gp.Spot.Column] = null;
-                Matrix[possibleSpot.Row, possibleSpot.Column] = gp;
-                gp.Spot = possibleSpot;
+                Matrix[newSpot.Row, newSpot.Column] = gp;
+                gp.Spot = newSpot;
+            }
+            using (var logger = new Logger.LogServiceClient())
+            {
+                logger.AddNewLogEntry(Utils.MoveMessage(gp, oldSpot, newSpot));
             }
             InspectCloserPlayers(gp.Nickname);
         }
@@ -67,6 +78,7 @@ namespace Business
         private static void SetMatchHelpers()
         {
             GamePlayers = new Dictionary<string, GamePlayer>();
+            MatchPlayers = new List<PlayerStats>();
             CurrentPlayersNumber = 0;
             Matrix = new GamePlayer[8, 8];
             ActiveMatch = false;
@@ -88,16 +100,36 @@ namespace Business
                     {
                         gp.Attack(playerToAttack);
                     }
-                    string msgToAttacker, msgToAttacked;
+
+                    string msgToAttacker, msgToAttacked, logMessage = "";
                     if (playerToAttack.IsAlive)
                     {
                         msgToAttacker = Utils.GetAttackerDamageStatus(gp, playerToAttack);
                         msgToAttacked = Utils.GetAttackedDamageStatus(gp, playerToAttack);
+
+                        logMessage = Utils.GetDamageStatus(gp, playerToAttack);
+                        using (var logger = new Logger.LogServiceClient())
+                        {
+                            logger.AddNewLogEntry(logMessage);
+                        }
                     }
                     else
                     {
+                        gp.KillScore += KILL_POINTS;
+
                         msgToAttacker = Utils.GetAttackerKillStatus(playerToAttack);
                         msgToAttacked = Utils.GetAttackedKillStatus(gp);
+
+                        logMessage = Utils.GetDamageStatus(gp, playerToAttack);
+                        using (var logger = new Logger.LogServiceClient())
+                        {
+                            logger.AddNewLogEntry(logMessage);
+                        }
+                        logMessage = Utils.GetKillStatus(gp, playerToAttack);
+                        using (var logger = new Logger.LogServiceClient())
+                        {
+                            logger.AddNewLogEntry(logMessage);
+                        }
                         RemoveDeadPlayer(playerToAttack);
                     }
                     ServerTransmitter.Send(gp.PlayerSocket, msgToAttacker);
@@ -130,38 +162,132 @@ namespace Business
 
         private static void EndMatch()
         {
-            int aliveMonsters = 0, aliveSurvivors = 0;
-            foreach (GamePlayer gp in GamePlayers.Values)
-            {
-                if (gp.IsMonster() && gp.IsAlive)
-                {
-                    aliveMonsters++;
-                }
-                else if (gp.IsSurvivor() && gp.IsAlive)
-                {
-                    aliveSurvivors++;
-                }
-            }
+            int aliveMonsters = GetAliveMonsters(), aliveSurvivors = GetAliveSurvivors();
+
             if (aliveMonsters == 1 && aliveSurvivors == 0)
             {
-                GamePlayer winner = GamePlayers.Values.First();
+                GamePlayer winner = MonsterWinner();
+                AddWinnerPointsToMonster(winner);
                 foreach (GamePlayer connectedPlayer in Party)
                 {
                     ServerTransmitter.Separator(connectedPlayer.PlayerSocket);
                     ServerTransmitter.Send(connectedPlayer.PlayerSocket, Utils.GetWinnerMessage(winner));
                     ServerTransmitter.Separator(connectedPlayer.PlayerSocket);
                 }
+                using (var logger = new Logger.LogServiceClient())
+                {
+                    logger.AddNewLogEntry(Utils.GetWinnerMessage(winner));
+                }
+                LogMatchResult();
                 Game.ResetMatch();
             }
             else if (aliveMonsters == 0 && aliveSurvivors > 0)
             {
+                AddWinPointsToSurvivors();
                 foreach (GamePlayer connectedPlayer in Party)
                 {
                     ServerTransmitter.Separator(connectedPlayer.PlayerSocket);
                     ServerTransmitter.Send(connectedPlayer.PlayerSocket, Utils.GetSurvivorWinMessage());
                     ServerTransmitter.Separator(connectedPlayer.PlayerSocket);
                 }
+                using (var logger = new Logger.LogServiceClient())
+                {
+                    logger.AddNewLogEntry(Utils.GetSurvivorWinMessage());
+                }
+                LogMatchResult();
                 Game.ResetMatch();
+            }
+        }
+
+        private static GamePlayer MonsterWinner()
+        {
+            return GamePlayers.Values.First();
+        }
+
+        private static int GetAliveSurvivors()
+        {
+            int aliveSurvivors = 0;
+            foreach (GamePlayer gp in GamePlayers.Values)
+            {
+                if (gp.IsSurvivor() && gp.IsAlive)
+                {
+                    aliveSurvivors++;
+                }
+            }
+            return aliveSurvivors;
+        }
+
+        private static int GetAliveMonsters()
+        {
+            int aliveMonsters = 0;
+            foreach (GamePlayer gp in GamePlayers.Values)
+            {
+                if (gp.IsMonster() && gp.IsAlive)
+                {
+                    aliveMonsters++;
+                }
+            }
+            return aliveMonsters;
+        }
+
+        private static void AddWinnerPointsToMonster(GamePlayer winner)
+        {
+            winner.KillScore += WINNER_POINTS;
+        }
+
+        private static void AddWinPointsToSurvivors()
+        {
+            foreach (GamePlayer player in GamePlayers.Values)
+            {
+                if (player.IsSurvivor() && player.IsAlive)
+                {
+                    player.KillScore += WINNER_POINTS;
+                }
+            }
+        }
+
+        private static void LogMatchResult(bool EndedByTime = false)
+        {
+            SetWinners(EndedByTime);
+            using (var logger = new Logger.LogServiceClient())
+            {
+                logger.AddNewGameResult(MatchPlayers.ToArray());
+            }
+        }
+
+        private static void SetWinners(bool EndedByTime)
+        {
+            int aliveMonsters = GetAliveMonsters(), aliveSurvivors = GetAliveSurvivors();
+            if (EndedByTime)
+            {
+                if (aliveSurvivors > 0)
+                {
+                    foreach (PlayerStats p in MatchPlayers)
+                    {
+                        if (p.IsSurvivor() && p.IsAlive)
+                        {
+                            p.IsWinner = true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (aliveMonsters == 1 && aliveSurvivors == 0)
+                {
+                    PlayerStats p = MatchPlayers.Find(mp => mp.Nickname == MonsterWinner().Nickname);
+                    p.IsWinner = true;
+                }
+                else if (aliveMonsters == 0 && aliveSurvivors > 0)
+                {
+                    foreach (PlayerStats p in MatchPlayers)
+                    {
+                        if (p.IsSurvivor() && p.IsAlive)
+                        {
+                            p.IsWinner = true;
+                        }
+                    }
+                }
             }
         }
 
@@ -188,6 +314,7 @@ namespace Business
 
         private static void RemoveDeadPlayer(GamePlayer playerToAttack)
         {
+            MarkAsKilled(playerToAttack);
             DeadPlayers.Add(playerToAttack.Nickname);
             lock (objMatrix)
             {
@@ -197,6 +324,11 @@ namespace Business
             {
                 GamePlayers.Remove(playerToAttack.Nickname);
             }
+        }
+
+        private static void MarkAsKilled(GamePlayer playerToAttack)
+        {
+            MatchPlayers.Find(mp => mp.Nickname == playerToAttack.Nickname).IsAlive = false;
         }
 
         private static List<GamePlayer> GetCloserPlayers(GamePlayer gp)
@@ -244,30 +376,30 @@ namespace Business
             GameTimer.Elapsed += EndGameByTimer;
             GameTimer.AutoReset = false;
             GameTimer.Enabled = true;
+            using (var logger = new Logger.LogServiceClient())
+            {
+                logger.StartNewGameLog();
+            }
         }
 
         private static void EndGameByTimer(Object source, ElapsedEventArgs e)
         {
-            int aliveMonsters = 0, aliveSurvivors = 0;
-            foreach (GamePlayer gp in GamePlayers.Values)
-            {
-                if (gp.IsMonster())
-                {
-                    aliveMonsters++;
-                }
-                else if (gp.IsSurvivor())
-                {
-                    aliveSurvivors++;
-                }
-            }
+            int aliveMonsters = GetAliveMonsters(), aliveSurvivors = GetAliveSurvivors();
             if (aliveSurvivors > 0)
             {
+                AddWinPointsToSurvivors();
                 foreach (GamePlayer connectedPlayer in Party)
                 {
                     ServerTransmitter.Separator(connectedPlayer.PlayerSocket);
                     ServerTransmitter.Send(connectedPlayer.PlayerSocket, Utils.GetSurvivorWinMessage());
                     ServerTransmitter.Separator(connectedPlayer.PlayerSocket);
                 }
+                using (var logger = new Logger.LogServiceClient())
+                {
+                    logger.AddNewLogEntry(Utils.TimesUp());
+                    logger.AddNewLogEntry(Utils.GetSurvivorWinMessage());
+                }
+                LogMatchResult(true);
                 Game.ResetMatch();
             }
             else if (aliveMonsters > 0 && aliveSurvivors == 0)
@@ -277,6 +409,11 @@ namespace Business
                     ServerTransmitter.Separator(connectedPlayer.PlayerSocket);
                     ServerTransmitter.Send(connectedPlayer.PlayerSocket, Utils.GetNoWinnersMessage());
                     ServerTransmitter.Separator(connectedPlayer.PlayerSocket);
+                }
+                using (var logger = new Logger.LogServiceClient())
+                {
+                    logger.AddNewLogEntry(Utils.TimesUp());
+                    logger.AddNewLogEntry(Utils.GetNoWinnersMessage());
                 }
                 Game.ResetMatch();
             }
@@ -340,6 +477,11 @@ namespace Business
                 CurrentPlayersNumber++;
             }
             InspectCloserPlayers(nickname);
+            using (var logger = new Logger.LogServiceClient())
+            {
+                logger.AddNewLogEntry(Utils.PlayerEntered(gp));
+            }
+            MatchPlayers.Add(new PlayerStats() { Nickname = gp.Nickname, Role = gp.Role });
         }
 
         public static bool IsCurrentlyPlayingMatch(Socket socket)

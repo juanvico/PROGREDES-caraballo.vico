@@ -56,6 +56,10 @@
     <None Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PlayerCRUDServiceInterfaces\PlayerCRUDServiceInterfaces.csproj">
+      <Project>{16799994-750c-4fdb-b00b-69f4c9e061f6}</Project>
+      <Name>PlayerCRUDServiceInterfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PlayerCRUDService\PlayerCRUDService.csproj">
       <Project>{6b6f87e0-ba27-42de-ba39-0bae9374357b}</Project>
       <Name>PlayerCRUDService</Name>

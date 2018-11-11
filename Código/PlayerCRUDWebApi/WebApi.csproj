@@ -188,14 +188,23 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="Connected Services\Logger\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Controllers\PlayersController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Controllers\RankingsController.cs" />
+    <Compile Include="Controllers\StatsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\MatchModel.cs" />
     <Compile Include="Models\Model.cs" />
     <Compile Include="Models\PlayerModel.cs" />
+    <Compile Include="Models\PlayerStatsModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -203,6 +212,12 @@
     <None Include="Connected Services\CRUDService\configuration91.svcinfo" />
     <None Include="Connected Services\CRUDService\configuration.svcinfo" />
     <None Include="Connected Services\CRUDService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Connected Services\Logger\configuration91.svcinfo" />
+    <None Include="Connected Services\Logger\configuration.svcinfo" />
+    <None Include="Connected Services\Logger\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
@@ -249,13 +264,30 @@
     <None Include="Connected Services\CRUDService\service1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Properties\DataSources\LogServiceInterfaces.Match.datasource" />
+    <Content Include="Properties\DataSources\LogServiceInterfaces.PlayerStats.datasource" />
+    <None Include="Connected Services\Logger\Arrays.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Logger\LogServiceInterfaces.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Logger\service.wsdl" />
+    <None Include="Connected Services\Logger\service.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Logger\service1.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -306,6 +338,10 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LogServiceInterfaces\LogServiceInterfaces.csproj">
+      <Project>{5b8d67cc-a6d3-4bdb-b6d3-e68c74ecd4e2}</Project>
+      <Name>LogServiceInterfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PlayerCRUDServiceInterfaces\PlayerCRUDServiceInterfaces.csproj">
       <Project>{16799994-750c-4fdb-b00b-69f4c9e061f6}</Project>
       <Name>PlayerCRUDServiceInterfaces</Name>
@@ -313,6 +349,7 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Connected Services\CRUDService\" />
+    <WCFMetadataStorage Include="Connected Services\Logger\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

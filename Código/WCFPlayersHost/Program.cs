@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WCFPlayersHost
 {
@@ -15,7 +11,7 @@ namespace WCFPlayersHost
             {
                 Console.WriteLine("Starting service...");
                 serviceHost.Open();
-                Console.WriteLine("Service is running, press return to sstop");
+                Console.WriteLine("Service is running, press return to stop");
                 Console.ReadLine();
             }
         }

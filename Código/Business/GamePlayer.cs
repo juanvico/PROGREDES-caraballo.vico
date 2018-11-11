@@ -11,6 +11,8 @@ namespace Business
         public int Life { get; set; }
         public int Damage { get; set; }
 
+        public int KillScore { get; set; }
+
         public bool IsAlive { get { return Life > 0; } }
 
         public PlayerSpot Spot;
@@ -32,8 +34,9 @@ namespace Business
             {
                 PlayerSocket = playerSocket,
                 Nickname = nickname,
-                Spot = new PlayerSpot(-1, -1)
-            };
+                Spot = new PlayerSpot(-1, -1),
+                KillScore = 0
+        };
             return gp;
         }
 
@@ -88,6 +91,7 @@ namespace Business
                 Life = 20;
             }
             Spot = new PlayerSpot(-1, -1);
+            KillScore = 0;
         }
     }
 }

@@ -6,61 +6,22 @@ namespace GameClient
 {
     public class ImageReader
     {
-        public const int fragmentSize = 32000;
-        private static FileStream stream;
-
-        public static bool SetPath(string path)
+        public static bool FileExists(string path)
         {
-            try
-            {
-                stream = File.OpenRead(path);
-                return true;
-            }
-            catch (FileNotFoundException)
-            {
-                return false;
-            }
+            return File.Exists(path);
         }
 
-        public static IEnumerable<byte[]> ImageFragments()
+        public static string GetBase64Image(string path)
         {
-            var fragment = new byte[fragmentSize];
-            while (true)
+            FileInfo fileInfo = new FileInfo(path);
+
+            byte[] data = new byte[fileInfo.Length];
+
+            using (FileStream fs = fileInfo.OpenRead())
             {
-                int fragmentLength = ReadFragment(fragment);
-
-                var imageFragment = new byte[fragmentLength];
-                Array.Copy(fragment, imageFragment, fragmentLength);
-
-                if (fragmentLength != 0)
-                {
-                    yield return imageFragment;
-                }
-                if (fragmentLength != fragment.Length)
-                {
-                    yield break;
-                }
+                fs.Read(data, 0, data.Length);
             }
-        }
-
-        private static int ReadFragment(byte[] fragment)
-        {
-            var pos = 0;
-            while (pos < fragment.Length)
-            {
-                int read = stream.Read(fragment, pos, fragment.Length - pos);
-                if (read == 0)
-                {
-                    break;
-                }
-                pos += read;
-            }
-            return pos;
-        }
-
-        public static void CloseFile()
-        {
-            stream.Close();
+            return Convert.ToBase64String(data);
         }
     }
 }

@@ -1,13 +1,8 @@
-﻿using Business;
-using PlayerCRUDServiceInterfaces;
+﻿using PlayerCRUDServiceInterfaces;
 using Protocols;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameServer
 {
@@ -46,14 +41,10 @@ namespace GameServer
                 {
                     Player player = new Player
                     {
-                        Nickname = nick
+                        Nickname = nick,
+                        Avatar = avatar
                     };
-                    if (!avatar.Equals("default"))
-                    {
-                        player.Avatar = GetTimestamp(DateTime.Now) + avatar;
-                        SaveImage(socket, player.Avatar);
-                    }
-                    else { player.Avatar = avatar; }
+                
                     using (var players = new CRUDService.PlayerCRUDServiceClient())
                     {
                         players.Add(player);
@@ -123,18 +114,6 @@ namespace GameServer
                 return false;
             }
             return true;
-        }
-
-        private static void SaveImage(Socket socket, string filename)
-        {
-            ImageWriter.SetImageLocation(filename);
-            while (true)
-            {
-                byte[] fragment = ServerTransmitter.ReceiveImage(socket);
-                ImageWriter.WriteFragment(fragment);
-                if (fragment.Length < ImageWriter.fragmentSize) break;
-            }
-            ImageWriter.CloseFile();
         }
 
         private static void LetExecuteGameAction(Socket socket, string cmd)

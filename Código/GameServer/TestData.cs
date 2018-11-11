@@ -17,7 +17,6 @@ namespace GameServer
                 players.Add(new Player() { Nickname = "7", Avatar = "default" });
                 players.Add(new Player() { Nickname = "8", Avatar = "default" });
             }
-
         }
     }
 }
