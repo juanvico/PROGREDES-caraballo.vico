@@ -16,7 +16,6 @@ namespace GameServer
             {
                 AskIPAndPort();
                 Game.InitGame();
-                TestData.LoadTestData();
                 var server = new Socket(
                     AddressFamily.InterNetwork,
                     SocketType.Stream,

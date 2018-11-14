@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Protocols
 {
@@ -65,26 +61,6 @@ namespace Protocols
             {
                 i += client.Send(messageLengthInBit, i, 4 - i, SocketFlags.None);
             }
-        }
-
-        public static byte[] ReceiveImage(Socket socket)
-        {
-            var pos = 0;
-            var lengthInBytes = new byte[4];
-            var i = 0;
-            while (i < 4)
-            {
-                i += socket.Receive(lengthInBytes, i, 4 - i, SocketFlags.None);
-            }
-            int length = BitConverter.ToInt32(lengthInBytes, 0);
-            var msgBytes = new byte[length];
-            while (pos < length)
-            {
-                var recieved = socket.Receive(msgBytes, pos, length - pos, SocketFlags.None);
-                if (recieved == 0) throw new SocketException();
-                pos += recieved;
-            }
-            return msgBytes;
         }
     }
 }

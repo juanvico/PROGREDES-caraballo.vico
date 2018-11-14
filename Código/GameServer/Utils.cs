@@ -1,5 +1,4 @@
-﻿using System;
-using Protocols;
+﻿using Protocols;
 using static GameServer.GamePlayer;
 
 namespace GameServer

@@ -62,29 +62,5 @@ namespace Protocols
                 i += client.Send(messageLengthInBit, i, 4 - i, SocketFlags.None);
             }
         }
-
-        public static void SendImage(Socket client, byte[] msg)
-        {
-            SendImageBitsLength(client, msg);
-
-            var pos = 0;
-            while (pos < msg.Length)
-            {
-                var sent = client.Send(msg, pos, msg.Length - pos, SocketFlags.None);
-                if (sent == 0) throw new SocketException();
-                pos += sent;
-            }
-        }
-
-        private static void SendImageBitsLength(Socket client, byte[] msg)
-        {
-            var length = msg.Length;
-            var dataLength = BitConverter.GetBytes(length);
-            var i = 0;
-            while (i < 4)
-            {
-                i += client.Send(dataLength, i, 4 - i, SocketFlags.None);
-            }
-        }
     }
 }

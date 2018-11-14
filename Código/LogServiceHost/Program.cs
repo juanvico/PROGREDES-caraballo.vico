@@ -1,5 +1,8 @@
 ﻿using System;
-using System.ServiceModel;
+using System.Configuration;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Tcp;
 
 namespace LogServiceHost
 {
@@ -7,13 +10,21 @@ namespace LogServiceHost
     {
         static void Main(string[] args)
         {
-            using (var serviceHost = new ServiceHost(typeof(LogService.LogService)))
-            {
-                Console.WriteLine("Starting service...");
-                serviceHost.Open();
-                Console.WriteLine("Service is running, press return to stop");
-                Console.ReadLine();
-            }
+            var remotingTcpChannel = new TcpChannel(Int32.Parse(ConfigurationManager.AppSettings["LogServiceHostPort"]));
+
+            ChannelServices.RegisterChannel(remotingTcpChannel, false);
+
+            RemotingConfiguration.RegisterWellKnownServiceType(
+                typeof(LogService.LogService),
+                ConfigurationManager.AppSettings["LogServiceHostName"],
+                WellKnownObjectMode.SingleCall);
+
+            Console.WriteLine("Server has started at: tcp://127.0.0.1:" +
+                ConfigurationManager.AppSettings["LogServiceHostPort"] + "/" +
+                ConfigurationManager.AppSettings["LogServiceHostName"]);
+            Console.ReadLine();
+
+            ChannelServices.UnregisterChannel(remotingTcpChannel);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using PlayerCRUDServiceInterfaces;
 using Protocols;
 using System;
+using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
 
@@ -8,6 +9,14 @@ namespace GameServer
 {
     public class ActionParser
     {
+        public static IPlayerCRUDService Players()
+        {
+            return (IPlayerCRUDService)Activator.GetObject(
+                                        typeof(IPlayerCRUDService),
+                                        "tcp://" + ConfigurationManager.AppSettings["PlayerCRUDServiceHostIP"] +
+                                        ":" + ConfigurationManager.AppSettings["PlayerCRUDServiceHostPort"]
+                                        + "/" + ConfigurationManager.AppSettings["PlayerCRUDServiceHostName"]);
+        }
         public static void Execute(Socket socket)
         {
             bool loop = true;
@@ -44,11 +53,7 @@ namespace GameServer
                         Nickname = nick,
                         Avatar = avatar
                     };
-                
-                    using (var players = new CRUDService.PlayerCRUDServiceClient())
-                    {
-                        players.Add(player);
-                    }
+                    Players().Add(player);
                     NotifyClientRegisteredPlayer(socket);
                 }
                 catch (NicknameInUseEx ex)
@@ -61,13 +66,11 @@ namespace GameServer
                 string nick = ServerTransmitter.Receive(socket);
                 try
                 {
-                    using (var players = new CRUDService.PlayerCRUDServiceClient())
+                    if (!Players().ExistsByNickname(nick))
                     {
-                        if (!players.ExistsByNickname(nick))
-                        {
-                            throw new NotExistingPlayer();
-                        }
+                        throw new NotExistingPlayer();
                     }
+                    
                     Game.ConnectPlayerToParty(GamePlayer.Create(socket, nick));
                     ServerTransmitter.Send(socket, "Player connected to the game.");
                 }
@@ -172,13 +175,10 @@ namespace GameServer
             else if (cmd.Equals("registeredplayers"))
             {
                 Console.WriteLine("REGISTERED PLAYERS:");
-
-                using (var players = new CRUDService.PlayerCRUDServiceClient())
+                
+                foreach (Player p in Players().GetPlayers())
                 {
-                    foreach (Player p in players.GetPlayers())
-                    {
-                        Console.WriteLine(p.Nickname + " (" + p.Avatar + ")");
-                    }
+                    Console.WriteLine(p.Nickname + " (" + p.Avatar + ")");
                 }
             }
             else if (cmd.Equals("connectedplayers"))

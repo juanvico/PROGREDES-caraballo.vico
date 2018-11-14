@@ -2,6 +2,7 @@
 using Protocols;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -30,6 +31,15 @@ namespace GameServer
         static readonly object objParty = new object();
         static readonly object objGamePlayers = new object();
         static readonly object objAttack = new object();
+
+        public static ILogService Logger()
+        {
+            return (ILogService)Activator.GetObject(
+                                        typeof(ILogService),
+                                        "tcp://" + ConfigurationManager.AppSettings["LogServiceHostIP"] +
+                                        ":" + ConfigurationManager.AppSettings["LogServiceHostPort"]
+                                        + "/" + ConfigurationManager.AppSettings["LogServiceHostName"]);
+        }
 
         public static bool IsDeadPlayer(Socket socket)
         {
@@ -67,10 +77,7 @@ namespace GameServer
                 Matrix[newSpot.Row, newSpot.Column] = gp;
                 gp.Spot = newSpot;
             }
-            using (var logger = new Logger.LogServiceClient())
-            {
-                logger.AddNewLogEntry(Utils.MoveMessage(gp, oldSpot, newSpot));
-            }
+            Logger().AddNewLogEntry(Utils.MoveMessage(gp, oldSpot, newSpot));
             InspectCloserPlayers(gp.Nickname);
         }
 
@@ -107,10 +114,7 @@ namespace GameServer
                         msgToAttacked = Utils.GetAttackedDamageStatus(gp, playerToAttack);
 
                         logMessage = Utils.GetDamageStatus(gp, playerToAttack);
-                        using (var logger = new Logger.LogServiceClient())
-                        {
-                            logger.AddNewLogEntry(logMessage);
-                        }
+                        Logger().AddNewLogEntry(logMessage);
                     }
                     else
                     {
@@ -120,15 +124,9 @@ namespace GameServer
                         msgToAttacked = Utils.GetAttackedKillStatus(gp);
 
                         logMessage = Utils.GetDamageStatus(gp, playerToAttack);
-                        using (var logger = new Logger.LogServiceClient())
-                        {
-                            logger.AddNewLogEntry(logMessage);
-                        }
+                        Logger().AddNewLogEntry(logMessage);
                         logMessage = Utils.GetKillStatus(gp, playerToAttack);
-                        using (var logger = new Logger.LogServiceClient())
-                        {
-                            logger.AddNewLogEntry(logMessage);
-                        }
+                        Logger().AddNewLogEntry(logMessage);
                         RemoveDeadPlayer(playerToAttack);
                     }
                     ServerTransmitter.Send(gp.PlayerSocket, msgToAttacker);
@@ -178,10 +176,7 @@ namespace GameServer
                     ServerTransmitter.Send(connectedPlayer.PlayerSocket, Utils.GetWinnerMessage(winner));
                     ServerTransmitter.Separator(connectedPlayer.PlayerSocket);
                 }
-                using (var logger = new Logger.LogServiceClient())
-                {
-                    logger.AddNewLogEntry(Utils.GetWinnerMessage(winner));
-                }
+                Logger().AddNewLogEntry(Utils.GetWinnerMessage(winner));
                 LogMatchResult();
                 Game.ResetMatch();
             }
@@ -194,10 +189,7 @@ namespace GameServer
                     ServerTransmitter.Send(connectedPlayer.PlayerSocket, Utils.GetSurvivorWinMessage());
                     ServerTransmitter.Separator(connectedPlayer.PlayerSocket);
                 }
-                using (var logger = new Logger.LogServiceClient())
-                {
-                    logger.AddNewLogEntry(Utils.GetSurvivorWinMessage());
-                }
+                Logger().AddNewLogEntry(Utils.GetSurvivorWinMessage());
                 LogMatchResult();
                 Game.ResetMatch();
             }
@@ -248,10 +240,7 @@ namespace GameServer
         private static void LogMatchResult(bool EndedByTime = false)
         {
             SetWinners(EndedByTime);
-            using (var logger = new Logger.LogServiceClient())
-            {
-                logger.AddNewGameResult(MatchPlayers.ToArray());
-            }
+            Logger().AddNewGameResult(MatchPlayers);
         }
 
         private static void SetWinners(bool EndedByTime)
@@ -375,10 +364,7 @@ namespace GameServer
             GameTimer.Elapsed += EndGameByTimer;
             GameTimer.AutoReset = false;
             GameTimer.Enabled = true;
-            using (var logger = new Logger.LogServiceClient())
-            {
-                logger.StartNewGameLog();
-            }
+            Logger().StartNewGameLog();
         }
 
         private static void EndGameByTimer(Object source, ElapsedEventArgs e)
@@ -393,11 +379,8 @@ namespace GameServer
                     ServerTransmitter.Send(connectedPlayer.PlayerSocket, Utils.GetSurvivorWinMessage());
                     ServerTransmitter.Separator(connectedPlayer.PlayerSocket);
                 }
-                using (var logger = new Logger.LogServiceClient())
-                {
-                    logger.AddNewLogEntry(Utils.TimesUp());
-                    logger.AddNewLogEntry(Utils.GetSurvivorWinMessage());
-                }
+                Logger().AddNewLogEntry(Utils.TimesUp());
+                Logger().AddNewLogEntry(Utils.GetSurvivorWinMessage());
                 LogMatchResult(true);
                 Game.ResetMatch();
             }
@@ -409,11 +392,8 @@ namespace GameServer
                     ServerTransmitter.Send(connectedPlayer.PlayerSocket, Utils.GetNoWinnersMessage());
                     ServerTransmitter.Separator(connectedPlayer.PlayerSocket);
                 }
-                using (var logger = new Logger.LogServiceClient())
-                {
-                    logger.AddNewLogEntry(Utils.TimesUp());
-                    logger.AddNewLogEntry(Utils.GetNoWinnersMessage());
-                }
+                Logger().AddNewLogEntry(Utils.TimesUp());
+                Logger().AddNewLogEntry(Utils.GetNoWinnersMessage());
                 Game.ResetMatch();
             }
         }
@@ -476,10 +456,7 @@ namespace GameServer
                 CurrentPlayersNumber++;
             }
             InspectCloserPlayers(nickname);
-            using (var logger = new Logger.LogServiceClient())
-            {
-                logger.AddNewLogEntry(Utils.PlayerEntered(gp));
-            }
+            Logger().AddNewLogEntry(Utils.PlayerEntered(gp));
             MatchPlayers.Add(new PlayerStats() { Nickname = gp.Nickname, Role = gp.Role });
         }
 

@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Messaging;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LogService
 {
@@ -81,13 +79,13 @@ namespace LogService
                 allPlayerStats.AddRange(match.PlayerStats);
             }
 
-            allPlayerStats.OrderByDescending(p => p.KillScore);
+            List<PlayerStats> SortedList = allPlayerStats.OrderBy(o => o.KillScore).ToList();
 
             List<PlayerStats> top = new List<PlayerStats>();
-            int count = allPlayerStats.Count;
+            int count = SortedList.Count;
             for (int i = count - 1; i >= 0; i--)
             {
-                top.Add(allPlayerStats[i]);
+                top.Add(SortedList[i]);
                 if (top.Count == 10)
                 {
                     i = -1;

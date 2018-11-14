@@ -9,19 +9,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameClient", "GameClient\Ga
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlayerCRUDService", "PlayerCRUDService\PlayerCRUDService.csproj", "{6B6F87E0-BA27-42DE-BA39-0BAE9374357B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "PlayerCRUDWebApi\WebApi.csproj", "{822EEB47-EC29-4499-90CB-25F4A47D45D2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WCFPlayersHost", "WCFPlayersHost\WCFPlayersHost.csproj", "{D0BC0F72-BD66-435F-A16C-780294778EC4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlayerCRUDServiceInterfaces", "PlayerCRUDServiceInterfaces\PlayerCRUDServiceInterfaces.csproj", "{16799994-750C-4FDB-B00B-69F4C9E061F6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protocols", "Protocols\Protocols.csproj", "{47966009-F935-46EA-BDC1-9AA6AD2731CC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogServiceInterfaces", "LogServiceInterfaces\LogServiceInterfaces.csproj", "{5B8D67CC-A6D3-4BDB-B6D3-E68C74ECD4E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WCFLogServiceHost", "LogServiceHost\WCFLogServiceHost.csproj", "{7066CB25-1C92-466D-84C9-238B41198E04}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogServiceHost", "LogServiceHost\LogServiceHost.csproj", "{7066CB25-1C92-466D-84C9-238B41198E04}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogService", "LogService\LogService.csproj", "{D3A4366D-FE3F-4D3F-B3BD-09C90D8E1A42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csproj", "{822EEB47-EC29-4499-90CB-25F4A47D45D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlayerCRUDServiceHost", "PlayerCRUDServiceHost\PlayerCRUDServiceHost.csproj", "{D0BC0F72-BD66-435F-A16C-780294778EC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,14 +41,6 @@ Global
 		{6B6F87E0-BA27-42DE-BA39-0BAE9374357B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B6F87E0-BA27-42DE-BA39-0BAE9374357B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B6F87E0-BA27-42DE-BA39-0BAE9374357B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{822EEB47-EC29-4499-90CB-25F4A47D45D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{822EEB47-EC29-4499-90CB-25F4A47D45D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{822EEB47-EC29-4499-90CB-25F4A47D45D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{822EEB47-EC29-4499-90CB-25F4A47D45D2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D0BC0F72-BD66-435F-A16C-780294778EC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D0BC0F72-BD66-435F-A16C-780294778EC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D0BC0F72-BD66-435F-A16C-780294778EC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D0BC0F72-BD66-435F-A16C-780294778EC4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{16799994-750C-4FDB-B00B-69F4C9E061F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{16799994-750C-4FDB-B00B-69F4C9E061F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16799994-750C-4FDB-B00B-69F4C9E061F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -69,6 +61,14 @@ Global
 		{D3A4366D-FE3F-4D3F-B3BD-09C90D8E1A42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3A4366D-FE3F-4D3F-B3BD-09C90D8E1A42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3A4366D-FE3F-4D3F-B3BD-09C90D8E1A42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{822EEB47-EC29-4499-90CB-25F4A47D45D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{822EEB47-EC29-4499-90CB-25F4A47D45D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{822EEB47-EC29-4499-90CB-25F4A47D45D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{822EEB47-EC29-4499-90CB-25F4A47D45D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0BC0F72-BD66-435F-A16C-780294778EC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0BC0F72-BD66-435F-A16C-780294778EC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0BC0F72-BD66-435F-A16C-780294778EC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0BC0F72-BD66-435F-A16C-780294778EC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
